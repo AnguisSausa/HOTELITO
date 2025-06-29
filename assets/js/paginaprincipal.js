@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     verificarSesion();
     cargarInformacionUsuario();
     cargarHabitacionesDisponibles();
+    verificarReservacionActiva();
 });
 
 // Función para verificar si el usuario está logueado
@@ -260,6 +261,99 @@ function manejarErrorSesion() {
         localStorage.removeItem('usuario');
         window.location.href = 'index.html';
     });
+}
+
+// Función para verificar si el usuario tiene una reservación activa
+async function verificarReservacionActiva() {
+    try {
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        const response = await fetch(`php/reservaciones/obtener_reservacion_actual.php?user_id=${usuario.id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarEnlaceMinibar();
+        }
+    } catch (error) {
+        console.error('Error al verificar reservación activa:', error);
+    }
+}
+
+// Función para mostrar el enlace al minibar
+function mostrarEnlaceMinibar() {
+    // Buscar el contenedor de enlaces o crear uno si no existe
+    let enlacesContainer = document.querySelector('.enlaces-usuario');
+    
+    if (!enlacesContainer) {
+        // Crear contenedor de enlaces si no existe
+        const mainContent = document.querySelector('.main-content') || document.querySelector('.container');
+        if (mainContent) {
+            enlacesContainer = document.createElement('div');
+            enlacesContainer.className = 'enlaces-usuario';
+            enlacesContainer.style.cssText = `
+                background: white;
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 30px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                text-align: center;
+            `;
+            mainContent.insertBefore(enlacesContainer, mainContent.firstChild);
+        }
+    }
+    
+    if (enlacesContainer) {
+        enlacesContainer.innerHTML = `
+            <h3 style="margin: 0 0 15px 0; color: #333;">
+                <i class="fas fa-glass-martini-alt"></i> ¡Tienes una reservación activa!
+            </h3>
+            <p style="margin: 0 0 20px 0; color: #666;">
+                Accede a nuestro minibar y gestiona tu reservación
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="minibar.html" class="btn-principal" style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 25px;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: transform 0.3s ease;
+                ">
+                    <i class="fas fa-shopping-cart"></i>
+                    Ir al Minibar
+                </a>
+                <a href="terminar_reservacion.html" class="btn-principal" style="
+                    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 25px;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: transform 0.3s ease;
+                ">
+                    <i class="fas fa-check-circle"></i>
+                    Terminar Reservación
+                </a>
+            </div>
+        `;
+        
+        // Agregar efecto hover a los botones
+        const botones = enlacesContainer.querySelectorAll('.btn-principal');
+        botones.forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    }
 }
 
 // Exportar funciones para uso global

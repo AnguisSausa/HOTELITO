@@ -13,6 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
 function verificarSesion() {
     usuarioActual = JSON.parse(localStorage.getItem('usuario'));
     
+    // Imprimir datos del usuario en localStorage
+    console.log('=== DATOS DEL USUARIO EN LOCALSTORAGE ===');
+    console.log('Usuario completo:', usuarioActual);
+    console.log('ID del usuario:', usuarioActual ? usuarioActual.id : 'No hay usuario');
+    console.log('Tipo de ID:', usuarioActual ? typeof usuarioActual.id : 'No hay usuario');
+    console.log('==========================================');
+    
     if (!usuarioActual) {
         Swal.fire({
             title: 'Sesión no válida',
@@ -202,6 +209,18 @@ async function enviarReservacion(formData) {
             precio_noche: formData.get('precio_noche')
         };
         
+        // Imprimir datos que se van a enviar
+        console.log('=== DATOS QUE SE VAN A ENVIAR ===');
+        console.log('Datos completos:', datosReservacion);
+        console.log('user_id:', datosReservacion.user_id, 'tipo:', typeof datosReservacion.user_id);
+        console.log('room_id:', datosReservacion.room_id, 'tipo:', typeof datosReservacion.room_id);
+        console.log('fecha_entrada:', datosReservacion.fecha_entrada);
+        console.log('num_noches:', datosReservacion.num_noches, 'tipo:', typeof datosReservacion.num_noches);
+        console.log('precio_noche:', datosReservacion.precio_noche, 'tipo:', typeof datosReservacion.precio_noche);
+        console.log('Usuario actual:', usuarioActual);
+        console.log('Habitación seleccionada:', habitacionSeleccionada);
+        console.log('==================================');
+        
         const response = await fetch('php/reservaciones/crear_reservacion.php', {
             method: 'POST',
             headers: {
@@ -221,8 +240,22 @@ async function enviarReservacion(formData) {
             }).then(() => {
                 window.location.href = 'paginaprincipal.html';
             });
+        } else if (data.error) {
+            // Si el backend manda un array de errores, únelos en un solo string
+            let mensaje = Array.isArray(data.error) ? data.error.join('\n') : data.error;
+            Swal.fire({
+                title: 'Error',
+                text: mensaje,
+                icon: 'error',
+                confirmButtonColor: '#667eea'
+            });
         } else {
-            throw new Error(data.message || 'Error al crear la reservación');
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al crear la reservación',
+                icon: 'error',
+                confirmButtonColor: '#667eea'
+            });
         }
     } catch (error) {
         console.error('Error:', error);

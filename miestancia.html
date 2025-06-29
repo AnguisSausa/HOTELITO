@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Estancia</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenido a tu estancia</h1>
+        <div id="cliente-info" class="card">
+            <h2>Datos del cliente</h2>
+            <div id="cliente-nombre"></div>
+            <div id="cliente-imagen">
+                <img id="img-cliente" src="assets/imgs/default-user.png" alt="Imagen de usuario" style="width:100px;height:100px;border-radius:50%;">
+            </div>
+        </div>
+        <div id="total-cuenta" class="card">
+            <h2>Total de tu cuenta</h2>
+            <div id="monto-total">$0.00</div>
+        </div>
+        <div id="datos-reservacion" class="card">
+            <h2>Datos de tu reservación</h2>
+            <ul>
+                <li><strong>Habitación:</strong> <span id="habitacion-numero"></span></li>
+                <li><strong>Tipo:</strong> <span id="habitacion-tipo"></span></li>
+                <li><strong>Fecha de entrada:</strong> <span id="fecha-entrada"></span></li>
+                <li><strong>Noches:</strong> <span id="num-noches"></span></li>
+                <li><strong>Precio por noche:</strong> <span id="precio-noche"></span></li>
+            </ul>
+        </div>
+    </div>
+    <script src="assets/js/miestancia.js"></script>
+</body>
+</html>
