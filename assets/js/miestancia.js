@@ -3,20 +3,36 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Obtener datos del usuario desde localStorage
     const usuario = JSON.parse(localStorage.getItem('usuario'));
+    // Imprimir en consola para depuración
+    console.log('Usuario en localStorage:', usuario);
+    if (usuario && usuario.fotoPerfil) {
+        console.log('Imagen base64:', usuario.fotoPerfil.substring(0, 100) + '...'); // Solo los primeros 100 caracteres
+    }
+    // Mostrar el objeto usuario en el div de depuración
+    const debugDiv = document.getElementById('debug-usuario');
+    if (debugDiv && usuario) {
+        debugDiv.textContent = JSON.stringify(usuario, null, 2);
+    }
     // Obtener datos de la reservación desde localStorage
     const reservacion = JSON.parse(localStorage.getItem('reservacion_actual'));
-    // Obtener total de la cuenta (puede actualizarse si hay minibar)
-    let totalCuenta = localStorage.getItem('total_cuenta') || 0;
 
     // Mostrar datos del cliente
     if (usuario) {
         document.getElementById('cliente-nombre').textContent = usuario.nombre;
-        // Si tienes imagen personalizada, cámbiala aquí
-        // document.getElementById('img-cliente').src = usuario.imagen || 'assets/imgs/default-user.png';
+        // Mostrar imagen en base64 si existe y es válida
+        if (usuario.fotoPerfil && usuario.fotoPerfil.startsWith('data:image/')) {
+            document.getElementById('img-cliente').src = usuario.fotoPerfil;
+        } else {
+            document.getElementById('img-cliente').src = 'assets/imgs/default-user.png';
+        }
     }
 
-    // Mostrar total de la cuenta
-    document.getElementById('monto-total').textContent = `$${parseFloat(totalCuenta).toFixed(2)}`;
+    // Mostrar total de la cuenta (usando total_precio de la reservación)
+    let total = 0;
+    if (reservacion && reservacion.total_precio) {
+        total = parseFloat(reservacion.total_precio);
+    }
+    document.getElementById('monto-total').textContent = `$${parseFloat(total).toFixed(2)}`;
 
     // Mostrar datos de la reservación
     if (reservacion) {

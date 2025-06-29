@@ -24,7 +24,7 @@ if (empty($email) || empty($password)) {
 }
 
 // Consulta para la tabla usuarios
-$stmt = $conexion->prepare("SELECT id, nombre_usuario, email, password, es_admin FROM usuarios WHERE email = ?");
+$stmt = $conexion->prepare("SELECT id, nombre_usuario, email, password, es_admin, imagen FROM usuarios WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -61,7 +61,8 @@ if ($password === $usuario['password']) {
             'id' => $usuario['id'],
             'nombre' => $usuario['nombre_usuario'],
             'email' => $usuario['email'],
-            'tipo' => $tipo
+            'tipo' => $tipo,
+            'fotoPerfil' => $usuario['imagen'] ?? ''
         ]
     ]);
 } else {
