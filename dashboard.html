@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hotel</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .dashboard-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+        
+        .dashboard-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .user-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .info-value {
+            color: #333;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .client-badge {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .dashboard-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-dashboard {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-logout {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+        
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        }
+        
+        .btn-home {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-container">
+            <div id="loading" class="loading">
+                <h3>Cargando información...</h3>
+            </div>
+            
+            <div id="error" class="error" style="display: none;">
+                <h3>Error al cargar la información</h3>
+                <p>No tienes permisos para acceder a esta página.</p>
+                <a href="login.html" class="btn-dashboard btn-home">Ir al Login</a>
+            </div>
+            
+            <div id="dashboard-content" style="display: none;">
+                <div class="dashboard-header">
+                    <h1>Dashboard</h1>
+                    <p>Bienvenido a tu panel de control</p>
+                </div>
+                
+                <div class="user-info">
+                    <h3>Información del Usuario</h3>
+                    <div class="info-item">
+                        <span class="info-label">ID:</span>
+                        <span class="info-value" id="user-id"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Nombre:</span>
+                        <span class="info-value" id="user-name"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="user-email"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Tipo de Usuario:</span>
+                        <span class="info-value" id="user-type"></span>
+                    </div>
+                </div>
+                
+                <div class="dashboard-actions">
+                    <a href="login.html" class="btn-dashboard btn-home">Ir al Login</a>
+                    <button onclick="cerrarSesion()" class="btn-dashboard btn-logout">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarSesion();
+        });
+        
+        function verificarSesion() {
+            fetch('php/usuario/verificar_sesion.php?ajax=1')
+                .then(response => response.json())
+                .then(data => {
+                    const loadingDiv = document.getElementById('loading');
+                    const errorDiv = document.getElementById('error');
+                    const contentDiv = document.getElementById('dashboard-content');
+                    
+                    loadingDiv.style.display = 'none';
+                    
+                    if (data.logueado) {
+                        mostrarDashboard(data.usuario);
+                        contentDiv.style.display = 'block';
+                    } else {
+                        errorDiv.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').style.display = 'block';
+                });
+        }
+        
+        function mostrarDashboard(usuario) {
+            document.getElementById('user-id').textContent = usuario.id;
+            document.getElementById('user-name').textContent = usuario.nombre_usuario;
+            document.getElementById('user-email').textContent = usuario.email;
+            
+            const userTypeElement = document.getElementById('user-type');
+            if (usuario.es_admin === 'admin') {
+                userTypeElement.innerHTML = '<span class="admin-badge">Administrador</span>';
+            } else {
+                userTypeElement.innerHTML = '<span class="client-badge">Cliente</span>';
+            }
+        }
+        
+        function cerrarSesion() {
+            fetch('php/usuario/logout.php', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Sesión cerrada exitosamente');
+                    window.location.href = 'login.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cerrar sesión');
+            });
+        }
+    </script>
+</body>
+</html> 
