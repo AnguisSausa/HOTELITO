@@ -30,6 +30,19 @@ body {
     backdrop-filter: blur(10px);
 }
 
+/* Contenedor de registro independiente */
+.registro-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
 .login-header {
     text-align: center;
     margin-bottom: 30px;
@@ -48,6 +61,55 @@ body {
 .login-header p {
     color: #666;
     font-size: 1rem;
+}
+
+/* Header de registro */
+.registro-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e1e5e9;
+}
+
+.registro-header h1 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.registro-header h2 {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.btn-volver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    color: white;
+    text-decoration: none;
 }
 
 /* Formularios */
@@ -214,61 +276,6 @@ body {
     border: 1px solid #f5c6cb;
 }
 
-/* Contenedor de registro */
-.registro-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
-}
-
-.registro-container .login-container {
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-}
-
-.registro-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e1e5e9;
-}
-
-.registro-header h2 {
-    color: #333;
-    font-size: 1.8rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.btn-cerrar {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #666;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.btn-cerrar:hover {
-    background: #f8f9fa;
-    color: #dc3545;
-}
-
 /* Checkbox personalizado */
 .checkbox-group {
     flex-direction: row;
@@ -327,15 +334,15 @@ body {
 
 /* Responsive */
 @media (max-width: 480px) {
-    .login-container {
+    .login-container, .registro-container {
         padding: 30px 20px;
     }
     
-    .login-header h1 {
+    .login-header h1, .registro-header h1 {
         font-size: 2rem;
     }
     
-    .registro-container .login-container {
+    .registro-container {
         max-width: 100%;
         margin: 10px;
     }
@@ -353,7 +360,7 @@ body {
     }
 }
 
-.login-container {
+.login-container, .registro-container {
     animation: fadeIn 0.5s ease;
 }
 

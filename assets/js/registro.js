@@ -32,32 +32,6 @@ function togglePassword() {
     }
 }
 
-function toggleRegPassword() {
-    const passwordInput = document.getElementById('regPassword');
-    const toggleBtn = document.querySelectorAll('.toggle-password i')[1];
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleBtn.className = 'fas fa-eye-slash';
-    } else {
-        passwordInput.type = 'password';
-        toggleBtn.className = 'fas fa-eye';
-    }
-}
-
-function mostrarRegistro() {
-    // Redirigir a la página de registro
-    window.location.href = 'registro.html';
-}
-
-function ocultarRegistro() {
-    document.getElementById('registroContainer').style.display = 'none';
-    document.getElementById('registroForm').reset();
-    document.getElementById('previewImagen').innerHTML = '';
-    imagenBase64 = '';
-    limpiarMensaje();
-}
-
 // Convertir imagen a base64
 function convertirImagenABase64(file) {
     return new Promise((resolve, reject) => {
@@ -73,7 +47,7 @@ function convertirImagenABase64(file) {
 }
 
 // Preview de imagen
-document.getElementById('regImagen').addEventListener('change', async function(e) {
+document.getElementById('imagen').addEventListener('change', async function(e) {
     const file = e.target.files[0];
     const previewDiv = document.getElementById('previewImagen');
     
@@ -106,8 +80,8 @@ document.getElementById('regImagen').addEventListener('change', async function(e
     }
 });
 
-// Validaciones en tiempo real
-document.getElementById('regTelefono').addEventListener('input', function(e) {
+// Validaciones en tiempo real para teléfono
+document.getElementById('telefono').addEventListener('input', function(e) {
     // Solo permitir números
     this.value = this.value.replace(/\D/g, '');
     
@@ -117,71 +91,21 @@ document.getElementById('regTelefono').addEventListener('input', function(e) {
     }
 });
 
-// Formulario de login
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    
-    // Validaciones básicas
-    if (!email || !password) {
-        mostrarMensaje('Por favor completa todos los campos', 'error');
-        return;
-    }
-    
-    if (!isValidEmail(email)) {
-        mostrarMensaje('Por favor ingresa un email válido', 'error');
-        return;
-    }
-    
-    // Mostrar loading
-    const submitBtn = this.querySelector('.btn-login');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
-    submitBtn.disabled = true;
-    
-    try {
-        const response = await fetch('php/login.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            mostrarMensaje(data.mensaje, 'success');
-            // Redirigir después de 2 segundos
-            setTimeout(() => {
-                window.location.href = 'home.html';
-            }, 2000);
-        } else {
-            mostrarMensaje(data.error, 'error');
-        }
-    } catch (error) {
-        mostrarMensaje('Error de conexión. Intenta nuevamente.', 'error');
-    } finally {
-        // Restaurar botón
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-});
+// Función para validar email
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
 
 // Formulario de registro
 document.getElementById('registroForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const nombre = document.getElementById('regNombre').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const password = document.getElementById('regPassword').value;
-    const telefono = document.getElementById('regTelefono').value.trim();
-    const esAdmin = document.getElementById('regEsAdmin').checked ? 1 : 0;
+    const nombre = document.getElementById('nombre').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const telefono = document.getElementById('telefono').value.trim();
+    const esAdmin = document.getElementById('es_admin').checked ? 1 : 0;
     
     // Validaciones
     const errores = [];
@@ -233,12 +157,15 @@ document.getElementById('registroForm').addEventListener('submit', async functio
         
         if (data.success) {
             mostrarMensaje(data.mensaje, 'success');
-            // Limpiar formulario y cerrar modal después de 2 segundos
+            // Limpiar formulario después de 2 segundos
             setTimeout(() => {
                 this.reset();
                 document.getElementById('previewImagen').innerHTML = '';
                 imagenBase64 = '';
-                ocultarRegistro();
+                // Redirigir al login después de 3 segundos
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
             }, 2000);
         } else {
             if (Array.isArray(data.error)) {
@@ -256,33 +183,13 @@ document.getElementById('registroForm').addEventListener('submit', async functio
     }
 });
 
-// Función para validar email
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-// Cerrar modal al hacer clic fuera de él
-document.getElementById('registroContainer').addEventListener('click', function(e) {
-    if (e.target === this) {
-        ocultarRegistro();
-    }
-});
-
-// Cerrar modal con ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        ocultarRegistro();
-    }
-});
-
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Sistema de login HOTELITO cargado');
+    console.log('Página de registro HOTELITO cargada');
     
     // Limpiar mensajes al cargar
     limpiarMensaje();
     
     // Enfocar en el primer campo
-    document.getElementById('email').focus();
+    document.getElementById('nombre').focus();
 }); 
