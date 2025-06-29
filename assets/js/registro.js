@@ -97,6 +97,17 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
+// Función para verificar la conexión antes de enviar
+async function verificarConexion() {
+    try {
+        const response = await fetch('php/test_conexion.php');
+        const data = await response.json();
+        return data.success;
+    } catch (error) {
+        return false;
+    }
+}
+
 // Formulario de registro
 document.getElementById('registroForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -138,6 +149,12 @@ document.getElementById('registroForm').addEventListener('submit', async functio
     submitBtn.disabled = true;
     
     try {
+        // Verificar conexión primero
+        const conexionOk = await verificarConexion();
+        if (!conexionOk) {
+            throw new Error('No se puede conectar con el servidor. Verifica que XAMPP esté ejecutándose.');
+        }
+        
         const response = await fetch('php/registrar_usuario.php', {
             method: 'POST',
             headers: {
@@ -152,6 +169,10 @@ document.getElementById('registroForm').addEventListener('submit', async functio
                 imagen: imagenBase64
             })
         });
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
         
         const data = await response.json();
         
@@ -175,7 +196,8 @@ document.getElementById('registroForm').addEventListener('submit', async functio
             }
         }
     } catch (error) {
-        mostrarMensaje('Error de conexión. Intenta nuevamente.', 'error');
+        console.error('Error completo:', error);
+        mostrarMensaje('Error de conexión: ' + error.message, 'error');
     } finally {
         // Restaurar botón
         submitBtn.innerHTML = originalText;

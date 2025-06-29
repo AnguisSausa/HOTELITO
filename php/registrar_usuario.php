@@ -4,8 +4,20 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Incluir conexión
-require_once 'conexion.php';
+try {
+    // Incluir conexión
+    require_once 'conexion.php';
+    
+    // Verificar que la conexión esté activa
+    if (!$conexion) {
+        throw new Exception('No se pudo establecer conexión con la base de datos');
+    }
+    
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error de conexión: ' . $e->getMessage()]);
+    exit;
+}
 
 // Solo permitir método POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -66,48 +78,65 @@ if (!empty($errores)) {
     exit;
 }
 
-// Verificar si el email ya existe
-$stmt = $conexion->prepare("SELECT id FROM usuarios WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$resultado = $stmt->get_result();
+try {
+    // Verificar si el email ya existe
+    $stmt = $conexion->prepare("SELECT id FROM usuarios WHERE email = ?");
+    if (!$stmt) {
+        throw new Exception('Error al preparar consulta: ' . $conexion->error);
+    }
+    
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
 
-if ($resultado->num_rows > 0) {
-    http_response_code(400);
-    echo json_encode(['error' => 'El email ya está registrado']);
-    exit;
-}
+    if ($resultado->num_rows > 0) {
+        http_response_code(400);
+        echo json_encode(['error' => 'El email ya está registrado']);
+        exit;
+    }
 
-// Hash de la contraseña
-$password_hash = password_hash($password, PASSWORD_DEFAULT);
+    // Hash de la contraseña
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
-// Procesar imagen si existe
-$imagen_base64 = '';
-if (!empty($imagen)) {
-    // Validar que sea una imagen válida en base64
-    if (preg_match('/^data:image\/(jpeg|jpg|png|gif);base64,/', $imagen)) {
-        $imagen_base64 = $imagen;
+    // Procesar imagen si existe
+    $imagen_base64 = '';
+    if (!empty($imagen)) {
+        // Validar que sea una imagen válida en base64
+        if (preg_match('/^data:image\/(jpeg|jpg|png|gif);base64,/', $imagen)) {
+            $imagen_base64 = $imagen;
+        } else {
+            $errores[] = 'Formato de imagen no válido';
+        }
+    }
+
+    // Insertar usuario en la tabla usuarios
+    $stmt = $conexion->prepare("INSERT INTO usuarios (nombre, email, password, telefono, es_admin, imagen) VALUES (?, ?, ?, ?, ?, ?)");
+    if (!$stmt) {
+        throw new Exception('Error al preparar inserción: ' . $conexion->error);
+    }
+    
+    $stmt->bind_param("ssssis", $nombre, $email, $password_hash, $telefono, $es_admin, $imagen_base64);
+
+    if ($stmt->execute()) {
+        $usuario_id = $conexion->insert_id;
+        echo json_encode([
+            'success' => true,
+            'mensaje' => 'Usuario registrado exitosamente',
+            'usuario_id' => $usuario_id
+        ]);
     } else {
-        $errores[] = 'Formato de imagen no válido';
+        throw new Exception('Error al ejecutar inserción: ' . $stmt->error);
+    }
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error en la base de datos: ' . $e->getMessage()]);
+} finally {
+    if (isset($stmt)) {
+        $stmt->close();
+    }
+    if (isset($conexion)) {
+        $conexion->close();
     }
 }
-
-// Insertar usuario en la tabla usuarios
-$stmt = $conexion->prepare("INSERT INTO usuarios (nombre, email, password, telefono, es_admin, imagen) VALUES (?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("ssssis", $nombre, $email, $password_hash, $telefono, $es_admin, $imagen_base64);
-
-if ($stmt->execute()) {
-    $usuario_id = $conexion->insert_id;
-    echo json_encode([
-        'success' => true,
-        'mensaje' => 'Usuario registrado exitosamente',
-        'usuario_id' => $usuario_id
-    ]);
-} else {
-    http_response_code(500);
-    echo json_encode(['error' => 'Error al registrar usuario: ' . $stmt->error]);
-}
-
-$stmt->close();
-$conexion->close();
 ?> 
