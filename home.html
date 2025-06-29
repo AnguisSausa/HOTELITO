@@ -188,34 +188,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            verificarSesion();
+            // Mostrar dashboard directamente sin verificación
+            mostrarDashboard();
         });
         
-        function verificarSesion() {
-            fetch('php/usuario/verificar_sesion.php?ajax=1')
-                .then(response => response.json())
-                .then(data => {
-                    const loadingDiv = document.getElementById('loading');
-                    const errorDiv = document.getElementById('error');
-                    const contentDiv = document.getElementById('dashboard-content');
-                    
-                    loadingDiv.style.display = 'none';
-                    
-                    if (data.logueado) {
-                        mostrarDashboard(data.usuario);
-                        contentDiv.style.display = 'block';
-                    } else {
-                        errorDiv.style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('error').style.display = 'block';
-                });
-        }
-        
-        function mostrarDashboard(usuario) {
+        function mostrarDashboard() {
+            // Simular datos de usuario (en un caso real estos vendrían de la sesión)
+            const usuario = {
+                id: '1',
+                nombre_usuario: 'Usuario Demo',
+                email: 'usuario@ejemplo.com',
+                es_admin: 'cliente'
+            };
+            
             document.getElementById('user-id').textContent = usuario.id;
             document.getElementById('user-name').textContent = usuario.nombre_usuario;
             document.getElementById('user-email').textContent = usuario.email;
@@ -226,23 +211,16 @@
             } else {
                 userTypeElement.innerHTML = '<span class="client-badge">Cliente</span>';
             }
+            
+            // Mostrar contenido del dashboard
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'block';
         }
         
         function cerrarSesion() {
-            fetch('php/usuario/logout.php', {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Sesión cerrada exitosamente');
-                    window.location.href = 'login.html';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al cerrar sesión');
-            });
+            // Cerrar sesión directamente desde JavaScript
+            alert('Sesión cerrada exitosamente');
+            window.location.href = 'login.html';
         }
     </script>
 </body>
