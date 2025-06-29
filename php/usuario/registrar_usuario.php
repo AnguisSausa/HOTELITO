@@ -24,18 +24,17 @@ if (!$datos) {
 }
 
 // Extraer datos
-$nombre_usuario = trim($datos['nombre_usuario'] ?? '');
+$nombre = trim($datos['nombre'] ?? '');
 $email = trim($datos['email'] ?? '');
 $password = $datos['password'] ?? '';
-$telefono = trim($datos['telefono'] ?? '');
 $imagen = $datos['imagen'] ?? '';
 
 // Validaciones
 $errores = [];
 
-// Validar nombre_usuario
-if (empty($nombre_usuario) || strlen($nombre_usuario) < 2) {
-    $errores[] = 'El nombre de usuario debe tener al menos 2 caracteres';
+// Validar nombre
+if (empty($nombre) || strlen($nombre) < 2) {
+    $errores[] = 'El nombre debe tener al menos 2 caracteres';
 }
 
 // Validar email
@@ -46,11 +45,6 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 // Validar password
 if (empty($password) || strlen($password) < 6) {
     $errores[] = 'La contraseña debe tener al menos 6 caracteres';
-}
-
-// Validar teléfono
-if (empty($telefono) || !preg_match('/^\d{10}$/', $telefono)) {
-    $errores[] = 'El teléfono debe tener exactamente 10 dígitos';
 }
 
 // Si hay errores, retornarlos
@@ -72,8 +66,8 @@ if ($resultado->num_rows > 0) {
     exit;
 }
 
-// Hash de la contraseña
-$password_hash = password_hash($password, PASSWORD_DEFAULT);
+// NO hashear la contraseña - guardarla directamente
+$password_plain = $password;
 
 // Procesar imagen si existe
 $imagen_base64 = '';
@@ -95,7 +89,7 @@ if (mysqli_num_rows($resultado) == 0) {
         nombre_usuario VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        telefono VARCHAR(10) NOT NULL,
+        telefono VARCHAR(10) DEFAULT '',
         es_admin VARCHAR(20) DEFAULT 'cliente',
         imagen LONGTEXT,
         fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -110,14 +104,15 @@ if (mysqli_num_rows($resultado) == 0) {
 
 // Insertar usuario en la tabla usuarios
 $es_admin = 'cliente'; // Todos los nuevos usuarios serán clientes
+$telefono = ''; // Campo vacío por defecto
 $stmt = $conexion->prepare("INSERT INTO usuarios (nombre_usuario, email, password, telefono, es_admin, imagen) VALUES (?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("ssssss", $nombre_usuario, $email, $password_hash, $telefono, $es_admin, $imagen_base64);
+$stmt->bind_param("ssssss", $nombre, $email, $password_plain, $telefono, $es_admin, $imagen_base64);
 
 if ($stmt->execute()) {
     $usuario_id = $conexion->insert_id;
     echo json_encode([
         'success' => true,
-        'mensaje' => 'Usuario registrado exitosamente',
+        'message' => 'Usuario registrado exitosamente',
         'usuario_id' => $usuario_id
     ]);
 } else {

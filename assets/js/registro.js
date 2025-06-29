@@ -1,26 +1,16 @@
-// Variables globales
-let imagenBase64 = '';
+const esEmailValido = email => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+};
 
-// Funciones de utilidad
-function mostrarMensaje(mensaje, tipo) {
-    const mensajeDiv = document.getElementById('mensaje');
-    mensajeDiv.textContent = mensaje;
-    mensajeDiv.className = `mensaje ${tipo}`;
-    mensajeDiv.style.display = 'block';
-    
-    // Ocultar mensaje después de 5 segundos
-    setTimeout(() => {
-        mensajeDiv.style.display = 'none';
-    }, 5000);
-}
+const esPasswordValido = password => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+};
 
-function limpiarMensaje() {
-    const mensajeDiv = document.getElementById('mensaje');
-    mensajeDiv.style.display = 'none';
-}
-
+// Función para mostrar/ocultar contraseña
 function togglePassword() {
-    const passwordInput = document.getElementById('password');
+    const passwordInput = document.getElementById('rpassword');
     const toggleBtn = document.querySelector('.toggle-password i');
     
     if (passwordInput.type === 'password') {
@@ -32,173 +22,87 @@ function togglePassword() {
     }
 }
 
-// Convertir imagen a base64
-function convertirImagenABase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            resolve(e.target.result);
-        };
-        reader.onerror = function(error) {
-            reject(error);
-        };
-        reader.readAsDataURL(file);
+// Función para preview de imagen
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('rimagen').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('previewImagen');
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 10px;">`;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '';
+        }
     });
-}
-
-// Preview de imagen
-document.getElementById('imagen').addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    const previewDiv = document.getElementById('previewImagen');
-    
-    if (file) {
-        // Validar tipo de archivo
-        if (!file.type.startsWith('image/')) {
-            mostrarMensaje('Por favor selecciona un archivo de imagen válido', 'error');
-            this.value = '';
-            previewDiv.innerHTML = '';
-            return;
-        }
-        
-        // Validar tamaño (máximo 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            mostrarMensaje('La imagen debe ser menor a 5MB', 'error');
-            this.value = '';
-            previewDiv.innerHTML = '';
-            return;
-        }
-        
-        try {
-            imagenBase64 = await convertirImagenABase64(file);
-            previewDiv.innerHTML = `<img src="${imagenBase64}" alt="Preview">`;
-        } catch (error) {
-            mostrarMensaje('Error al procesar la imagen', 'error');
-        }
-    } else {
-        previewDiv.innerHTML = '';
-        imagenBase64 = '';
-    }
 });
 
-// Validaciones en tiempo real para teléfono
-document.getElementById('telefono').addEventListener('input', function(e) {
-    // Solo permitir números
-    this.value = this.value.replace(/\D/g, '');
-    
-    // Limitar a 10 dígitos
-    if (this.value.length > 10) {
-        this.value = this.value.slice(0, 10);
-    }
-});
+// Registro
+const crearCuenta = async () => {
+    let email = document.querySelector("#remail").value;
+    let password = document.querySelector("#rpassword").value;
+    let nombre = document.querySelector("#rnombre").value;
+    let imagenInput = document.querySelector('#rimagen');
 
-// Función para validar email
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-// Formulario de registro
-document.getElementById('registroForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const nombre_usuario = document.getElementById('nombre_usuario').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const telefono = document.getElementById('telefono').value.trim();
-    // es_admin se maneja automáticamente en el backend
-    
-    // Validaciones
-    const errores = [];
-    
-    if (!nombre_usuario || nombre_usuario.length < 2) {
-        errores.push('El nombre de usuario debe tener al menos 2 caracteres');
-    }
-    
-    if (!isValidEmail(email)) {
-        errores.push('El email no es válido');
-    }
-    
-    if (!password || password.length < 6) {
-        errores.push('La contraseña debe tener al menos 6 caracteres');
-    }
-    
-    if (!telefono || telefono.length !== 10) {
-        errores.push('El teléfono debe tener exactamente 10 dígitos');
-    }
-    
-    if (errores.length > 0) {
-        mostrarMensaje(errores.join(', '), 'error');
+    if(!esEmailValido(email)){
+        Swal.fire({ title: "Error!", text:"Email incorrecto", icon: "error"});
         return;
     }
-    
-    // Mostrar loading
-    const submitBtn = this.querySelector('.btn-registro');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
-    submitBtn.disabled = true;
-    
+    if (!esPasswordValido(password)) {
+        Swal.fire({ title: "ERROR!", text: "Password incorrecto! Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo", icon: "error" });
+        return;
+    }
+    if (nombre.trim() === "") {
+        Swal.fire({ title: "ERROR!", text: "Falta nombre", icon: "error" });
+        return;
+    }
+
+    // Procesar imagen
+    let imagenBase64 = null;
+    if (imagenInput.files && imagenInput.files[0]) {
+        imagenBase64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(imagenInput.files[0]);
+        });
+    } else {
+        // Si no hay imagen, se envía la ruta por defecto
+        imagenBase64 = 'assets/img/usuario.jpg';
+    }
+
+    let usuario = {email, password, nombre, imagen: imagenBase64};
+
     try {
         const response = await fetch('php/usuario/registrar_usuario.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                nombre_usuario: nombre_usuario,
-                email: email,
-                password: password,
-                telefono: telefono,
-                imagen: imagenBase64
-            })
+            body: JSON.stringify(usuario)
         });
-        
-        const responseText = await response.text();
-        console.log('Response text:', responseText);
-        
-        let data;
-        try {
-            data = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('Error parsing JSON:', parseError);
-            throw new Error('Respuesta del servidor no válida: ' + responseText);
-        }
-        
+
+        const data = await response.json();
+
         if (data.success) {
-            mostrarMensaje(data.mensaje, 'success');
-            // Limpiar formulario después de 2 segundos
-            setTimeout(() => {
-                this.reset();
-                document.getElementById('previewImagen').innerHTML = '';
-                imagenBase64 = '';
-                // Redirigir al login después de 3 segundos
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            }, 2000);
+            // Guardar usuario en localStorage
+            localStorage.setItem('usuario', JSON.stringify({
+                nombre: nombre,
+                email: email,
+                fotoPerfil: imagenBase64
+            }));
+            Swal.fire({ title: "EXITO!", text: "SE CREO CORRECTAMENTE!!!", icon: "success"});
+            setTimeout(function() {
+                window.location.href = "index.html";
+            }, 1000);
         } else {
-            if (Array.isArray(data.error)) {
-                mostrarMensaje(data.error.join(', '), 'error');
-            } else {
-                mostrarMensaje(data.error, 'error');
-            }
+            Swal.fire('Error', data.message, 'error');
         }
     } catch (error) {
-        console.error('Error completo:', error);
-        mostrarMensaje('Error de conexión: ' + error.message, 'error');
-    } finally {
-        // Restaurar botón
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+        Swal.fire('Error', 'Hubo un problema al conectar con el servidor', 'error');
+        console.error('Error:', error);
     }
-});
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Página de registro HOTELITO cargada');
-    
-    // Limpiar mensajes al cargar
-    limpiarMensaje();
-    
-    // Enfocar en el primer campo
-    document.getElementById('nombre_usuario').focus();
-}); 
+} 

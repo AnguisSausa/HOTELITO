@@ -6,6 +6,7 @@
     <title>HOTELITO - Registro de Usuario</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="container">
@@ -13,26 +14,26 @@
             <div class="registro-header">
                 <h1><i class="fas fa-hotel"></i> HOTELITO</h1>
                 <h2><i class="fas fa-user-plus"></i> Registro de Usuario</h2>
-                <a href="login.html" class="btn-volver">
+                <a href="index.html" class="btn-volver">
                     <i class="fas fa-arrow-left"></i> Volver al Login
                 </a>
             </div>
 
             <form id="registroForm" class="registro-form">
                 <div class="form-group">
-                    <label for="nombre_usuario"><i class="fas fa-user"></i> Nombre de Usuario</label>
-                    <input type="text" id="nombre_usuario" name="nombre_usuario" required minlength="2" placeholder="Ingresa tu nombre de usuario">
+                    <label for="rnombre"><i class="fas fa-user"></i> Nombre de Usuario</label>
+                    <input type="text" id="rnombre" name="rnombre" required minlength="2" placeholder="Ingresa tu nombre de usuario">
                 </div>
 
                 <div class="form-group">
-                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
+                    <label for="remail"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="remail" name="remail" required placeholder="ejemplo@correo.com">
                 </div>
 
                 <div class="form-group">
-                    <label for="password"><i class="fas fa-lock"></i> Contraseña</label>
+                    <label for="rpassword"><i class="fas fa-lock"></i> Contraseña</label>
                     <div class="password-input">
-                        <input type="password" id="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                        <input type="password" id="rpassword" name="rpassword" required minlength="8" placeholder="Mínimo 8 caracteres con mayúscula, minúscula, número y símbolo">
                         <button type="button" class="toggle-password" onclick="togglePassword()">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -40,17 +41,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="telefono"><i class="fas fa-phone"></i> Teléfono (10 dígitos)</label>
-                    <input type="tel" id="telefono" name="telefono" required pattern="[0-9]{10}" maxlength="10" placeholder="1234567890">
-                </div>
-
-                <div class="form-group">
-                    <label for="imagen"><i class="fas fa-image"></i> Imagen de Perfil (Opcional)</label>
-                    <input type="file" id="imagen" name="imagen" accept="image/*">
+                    <label for="rimagen"><i class="fas fa-image"></i> Imagen de Perfil (Opcional)</label>
+                    <input type="file" id="rimagen" name="rimagen" accept="image/*">
                     <div id="previewImagen" class="imagen-preview"></div>
                 </div>
 
-                <button type="submit" class="btn-registro">
+                <button type="button" onclick="crearCuenta()" class="btn-registro">
                     <i class="fas fa-save"></i> Registrar Usuario
                 </button>
             </form>

@@ -8,94 +8,67 @@ header('Access-Control-Allow-Headers: Content-Type');
 // Incluir conexión
 require_once '../conexion.php';
 
-// Solo permitir método POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Método no permitido']);
+// Obtener datos del cuerpo de la petición
+$data = json_decode(file_get_contents('php://input'), true);
+
+$email = $data['email'] ?? '';
+$password = $data['password'] ?? '';
+
+// Validar campos vacíos
+if (empty($email) || empty($password)) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Email y contraseña son requeridos'
+    ]);
     exit;
 }
 
-// Obtener datos del formulario
-$datos = json_decode(file_get_contents('php://input'), true);
+// Consulta para la tabla usuarios
+$stmt = $conexion->prepare("SELECT id, nombre_usuario, email, password, es_admin FROM usuarios WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
 
-if (!$datos) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Datos no válidos']);
+if ($result->num_rows === 0) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Usuario no encontrado'
+    ]);
     exit;
 }
 
-// Extraer datos
-$email = trim($datos['email'] ?? '');
-$password = $datos['password'] ?? '';
+$usuario = $result->fetch_assoc();
 
-// Validaciones
-$errores = [];
-
-// Validar email
-if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errores[] = 'El email no es válido';
-}
-
-// Validar password
-if (empty($password)) {
-    $errores[] = 'La contraseña es requerida';
-}
-
-// Si hay errores, retornarlos
-if (!empty($errores)) {
-    http_response_code(400);
-    echo json_encode(['error' => $errores]);
-    exit;
-}
-
-try {
-    // Buscar usuario por email
-    $stmt = $conexion->prepare("SELECT id, nombre_usuario, email, password, es_admin FROM usuarios WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
+// Verificar contraseña directamente (sin hash)
+if ($password === $usuario['password']) {
+    // Eliminar la contraseña del array antes de devolverlo
+    unset($usuario['password']);
     
-    if ($resultado->num_rows === 0) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Email o contraseña incorrectos']);
+    // Validar que el tipo sea admin o cliente
+    $tipo = strtolower($usuario['es_admin'] ?? '');
+    if (!in_array($tipo, ['admin', 'cliente'])) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Tipo de usuario no válido'
+        ]);
         exit;
     }
-    
-    $usuario = $resultado->fetch_assoc();
-    
-    // Verificar contraseña
-    if (!password_verify($password, $usuario['password'])) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Email o contraseña incorrectos']);
-        exit;
-    }
-    
-    // Crear sesión
-    $_SESSION['usuario_id'] = $usuario['id'];
-    $_SESSION['nombre_usuario'] = $usuario['nombre_usuario'];
-    $_SESSION['email'] = $usuario['email'];
-    $_SESSION['es_admin'] = $usuario['es_admin'];
-    $_SESSION['logueado'] = true;
-    
-    // Determinar mensaje según el tipo de usuario
-    $mensaje = $usuario['es_admin'] === 'admin' ? 
-        'Bienvenido administrador ' . $usuario['nombre_usuario'] : 
-        'Bienvenido ' . $usuario['nombre_usuario'];
     
     echo json_encode([
         'success' => true,
-        'mensaje' => $mensaje,
+        'message' => 'Login exitoso',
         'usuario' => [
             'id' => $usuario['id'],
-            'nombre_usuario' => $usuario['nombre_usuario'],
+            'nombre' => $usuario['nombre_usuario'],
             'email' => $usuario['email'],
-            'es_admin' => $usuario['es_admin']
+            'tipo' => $tipo
         ]
     ]);
-    
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Error interno del servidor']);
+} else {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Contraseña incorrecta'
+    ]);
 }
 
 $stmt->close();
