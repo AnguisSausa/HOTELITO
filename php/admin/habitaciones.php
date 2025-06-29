@@ -51,46 +51,8 @@ $conn->close();
 function obtenerHabitaciones() {
     global $conn;
     
-    // Verificar si la tabla habitaciones existe, si no, crearla
-    $sql_check = "SHOW TABLES LIKE 'habitaciones'";
-    $result_check = $conn->query($sql_check);
-    
-    if ($result_check->num_rows == 0) {
-        // Crear la tabla habitaciones
-        $sql_create = "CREATE TABLE habitaciones (
-            room_id INT AUTO_INCREMENT PRIMARY KEY,
-            room_number INT NOT NULL UNIQUE,
-            room_type VARCHAR(50) NOT NULL,
-            description TEXT,
-            capacity INT NOT NULL,
-            precio_noche DECIMAL(10,2) NOT NULL,
-            status VARCHAR(20) NOT NULL DEFAULT 'Disponible',
-            imagen LONGTEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )";
-        
-        if ($conn->query($sql_create) === TRUE) {
-            // Insertar algunas habitaciones de ejemplo
-            $habitaciones_ejemplo = [
-                [101, 'Individual', 'Habitación individual con baño privado', 1, 50.00, 'Disponible'],
-                [102, 'Doble', 'Habitación doble con vista al mar', 2, 80.00, 'Disponible'],
-                [201, 'Suite', 'Suite de lujo con jacuzzi', 4, 150.00, 'Disponible'],
-                [202, 'Familiar', 'Habitación familiar espaciosa', 6, 120.00, 'Disponible']
-            ];
-            
-            $sql_insert = "INSERT INTO habitaciones (room_number, room_type, description, capacity, precio_noche, status) VALUES (?, ?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql_insert);
-            
-            foreach ($habitaciones_ejemplo as $habitacion) {
-                $stmt->bind_param("issids", $habitacion[0], $habitacion[1], $habitacion[2], $habitacion[3], $habitacion[4], $habitacion[5]);
-                $stmt->execute();
-            }
-        }
-    }
-    
     // Obtener todas las habitaciones
-    $sql = "SELECT room_id, room_number, room_type, description, capacity, precio_noche, status, imagen, created_at, updated_at FROM habitaciones ORDER BY room_number";
+    $sql = "SELECT room_id, room_number, room_type, description, capacity, precio_noche, status, imagen FROM habitaciones ORDER BY room_number";
     $result = $conn->query($sql);
     
     $habitaciones = [];
@@ -105,9 +67,7 @@ function obtenerHabitaciones() {
                 'capacity' => $row['capacity'],
                 'precio_noche' => $row['precio_noche'],
                 'status' => $row['status'],
-                'imagen' => $row['imagen'],
-                'created_at' => $row['created_at'],
-                'updated_at' => $row['updated_at']
+                'imagen' => $row['imagen']
             ];
         }
     }
@@ -130,7 +90,7 @@ function obtenerHabitacion() {
     }
     
     // Obtener la habitación específica
-    $sql = "SELECT room_id, room_number, room_type, description, capacity, precio_noche, status, imagen, created_at, updated_at FROM habitaciones WHERE room_id = ?";
+    $sql = "SELECT room_id, room_number, room_type, description, capacity, precio_noche, status, imagen FROM habitaciones WHERE room_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $room_id);
     $stmt->execute();
@@ -152,9 +112,7 @@ function obtenerHabitacion() {
             'capacity' => $habitacion['capacity'],
             'precio_noche' => $habitacion['precio_noche'],
             'status' => $habitacion['status'],
-            'imagen' => $habitacion['imagen'],
-            'created_at' => $habitacion['created_at'],
-            'updated_at' => $habitacion['updated_at']
+            'imagen' => $habitacion['imagen']
         ],
         'message' => 'Habitación obtenida correctamente'
     ]);
@@ -227,9 +185,10 @@ function guardarHabitacion() {
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("issidss", $room_number, $room_type, $description, $capacity, $precio_noche, $status, $imagen_base64);
         } else {
-            $sql = "INSERT INTO habitaciones (room_number, room_type, description, capacity, precio_noche, status) VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO habitaciones (room_number, room_type, description, capacity, precio_noche, status, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("issids", $room_number, $room_type, $description, $capacity, $precio_noche, $status);
+            $imagen_vacia = '';
+            $stmt->bind_param("issidss", $room_number, $room_type, $description, $capacity, $precio_noche, $status, $imagen_vacia);
         }
         
         $action = 'creada';
