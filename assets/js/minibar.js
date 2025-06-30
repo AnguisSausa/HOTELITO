@@ -1,109 +1,34 @@
 // Variables globales
 let carrito = [];
 let productos = [];
-let reservacionActual = null;
-let precioHabitacion = 0;
 
 // Inicializar la página
-document.addEventListener('DOMContentLoaded', function() {
-    verificarSesion();
-    cargarReservacionActual();
-    cargarProductos();
-    configurarEventos();
+// Solo cargar productos del minibar
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await cargarProductos();
 });
-
-// Verificar sesión del usuario
-function verificarSesion() {
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
-    
-    if (!usuario) {
-        Swal.fire({
-            title: 'Sesión no válida',
-            text: 'Debes iniciar sesión para acceder al minibar',
-            icon: 'warning',
-            confirmButtonColor: '#667eea'
-        }).then(() => {
-            window.location.href = 'index.html';
-        });
-        return;
-    }
-}
-
-// Cargar información de la reservación actual
-async function cargarReservacionActual() {
-    try {
-        const usuario = JSON.parse(localStorage.getItem('usuario'));
-        const response = await fetch(`php/reservaciones/obtener_reservacion_actual.php?user_id=${usuario.id}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            reservacionActual = data.reservacion;
-            precioHabitacion = data.reservacion.total_precio;
-            mostrarInformacionReservacion();
-        } else {
-            Swal.fire({
-                title: 'Sin reservación activa',
-                text: 'No tienes una reservación activa para acceder al minibar',
-                icon: 'info',
-                confirmButtonColor: '#667eea'
-            }).then(() => {
-                window.location.href = 'paginaprincipal.html';
-            });
-        }
-    } catch (error) {
-        console.error('Error al cargar reservación:', error);
-        mostrarError('Error al cargar la información de tu reservación');
-    }
-}
-
-// Mostrar información de la reservación
-function mostrarInformacionReservacion() {
-    if (!reservacionActual) return;
-    
-    const detallesContainer = document.getElementById('reservation-details');
-    detallesContainer.innerHTML = `
-        <div class="detail-item">
-            <i class="fas fa-bed"></i>
-            <span>Habitación: ${reservacionActual.room_number}</span>
-        </div>
-        <div class="detail-item">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Fecha de entrada: ${formatearFecha(reservacionActual.fecha_entrada)}</span>
-        </div>
-        <div class="detail-item">
-            <i class="fas fa-moon"></i>
-            <span>Noches: ${reservacionActual.num_noches}</span>
-        </div>
-        <div class="detail-item">
-            <i class="fas fa-dollar-sign"></i>
-            <span>Total habitación: $${reservacionActual.total_precio}</span>
-        </div>
-    `;
-}
 
 // Cargar productos del minibar
 async function cargarProductos() {
     try {
         const response = await fetch('php/minibar/obtener_productos.php');
         const data = await response.json();
-        
         if (data.success) {
             productos = data.productos;
             mostrarProductos();
         } else {
-            console.error('Error al cargar productos:', data.message);
             mostrarError('Error al cargar los productos del minibar');
         }
     } catch (error) {
-        console.error('Error de conexión:', error);
         mostrarError('Error de conexión al cargar productos');
     }
 }
 
 // Mostrar productos en el grid
 function mostrarProductos() {
-    const gridContainer = document.getElementById('products-grid');
-    
+    const gridContainer = document.getElementById('productos-grid');
+    if (!gridContainer) return;
     if (productos.length === 0) {
         gridContainer.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
@@ -113,7 +38,6 @@ function mostrarProductos() {
         `;
         return;
     }
-    
     const productosHTML = productos.map(producto => `
         <div class="product-card">
             <div class="product-image">
@@ -131,20 +55,9 @@ function mostrarProductos() {
                     </span>
                 </div>
                 <div class="product-price">$${producto.precio}</div>
-                <div class="product-actions">
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="cambiarCantidad(${producto.id}, -1)" disabled>-</button>
-                        <span class="quantity-display" id="qty-${producto.id}">0</span>
-                        <button class="quantity-btn" onclick="cambiarCantidad(${producto.id}, 1)">+</button>
-                    </div>
-                    <button class="add-to-cart-btn" onclick="agregarAlCarrito(${producto.id})" disabled>
-                        <i class="fas fa-plus"></i> Agregar
-                    </button>
-                </div>
             </div>
         </div>
     `).join('');
-    
     gridContainer.innerHTML = productosHTML;
 }
 
@@ -211,7 +124,7 @@ function actualizarCarrito() {
     const cartItems = document.getElementById('cart-items');
     const cartTotal = document.getElementById('cart-total');
     const checkoutBtn = document.getElementById('checkout-btn');
-    
+    if (!cartItems || !cartTotal || !checkoutBtn) return;
     if (carrito.length === 0) {
         cartItems.innerHTML = `
             <div class="empty-cart">
@@ -239,10 +152,9 @@ function actualizarCarrito() {
     
     // Calcular totales
     const subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
-    const total = subtotal + precioHabitacion;
     
-    document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('subtotal') && (document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`);
+    document.getElementById('total') && (document.getElementById('total').textContent = `$${subtotal.toFixed(2)}`);
     
     cartTotal.style.display = 'block';
     checkoutBtn.disabled = false;
@@ -250,7 +162,16 @@ function actualizarCarrito() {
 
 // Configurar eventos
 function configurarEventos() {
-    document.getElementById('checkout-btn').addEventListener('click', finalizarCompra);
+    const btnCarrito = document.querySelector('.btn-carrito');
+    if (btnCarrito) {
+        btnCarrito.addEventListener('click', () => {
+            // Lógica para mostrar el carrito
+        });
+    }
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', finalizarCompra);
+    }
 }
 
 // Finalizar compra
@@ -258,16 +179,11 @@ async function finalizarCompra() {
     if (carrito.length === 0) return;
     
     try {
-        const usuario = JSON.parse(localStorage.getItem('usuario'));
         const subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
-        const total = subtotal + precioHabitacion;
         
         const datosCompra = {
-            user_id: usuario.id,
-            reservation_id: reservacionActual.reservation_id,
             productos: carrito,
-            subtotal_minibar: subtotal,
-            total_spend: total
+            subtotal_minibar: subtotal
         };
         
         const response = await fetch('php/minibar/finalizar_compra.php', {
@@ -313,10 +229,14 @@ function formatearFecha(fecha) {
 }
 
 function mostrarError(mensaje) {
-    Swal.fire({
-        title: 'Error',
-        text: mensaje,
-        icon: 'error',
-        confirmButtonColor: '#dc3545'
-    });
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Error',
+            text: mensaje,
+            icon: 'error',
+            confirmButtonColor: '#667eea'
+        });
+    } else {
+        alert(mensaje);
+    }
 } 

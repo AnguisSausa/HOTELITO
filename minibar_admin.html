@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Minibar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            background: #f7f7fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .header {
+            background: #667eea;
+            color: #fff;
+            padding: 32px 0 18px 0;
+            text-align: center;
+            font-size: 2.2em;
+            font-weight: 900;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 24px rgba(102,126,234,0.10);
+        }
+        .container {
+            max-width: 1100px;
+            margin: 36px auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 2px 12px rgba(102,126,234,0.10);
+            padding: 32px 24px 24px 24px;
+        }
+        .crud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .crud-header h2 {
+            margin: 0;
+            color: #374151;
+            font-size: 1.3em;
+        }
+        .btn-agregar {
+            background: #10b981;
+            color: #fff;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 28px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-agregar:hover {
+            background: #059669;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #fff;
+        }
+        th, td {
+            padding: 12px 10px;
+            text-align: center;
+        }
+        th {
+            background: #667eea;
+            color: #fff;
+            font-weight: 700;
+        }
+        tr:nth-child(even) { background: #f0f4ff; }
+        tr:nth-child(odd) { background: #fff; }
+        td img {
+            max-width: 60px;
+            max-height: 60px;
+            border-radius: 8px;
+        }
+        .crud-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 0 6px;
+            color: #667eea;
+            transition: color 0.2s;
+        }
+        .crud-actions button:hover {
+            color: #e53e3e;
+        }
+        /* Modal */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.25);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(102,126,234,0.18);
+            padding: 32px 24px 18px 24px;
+            min-width: 320px;
+            max-width: 95vw;
+        }
+        .modal h3 {
+            margin-top: 0;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+        .modal form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .modal label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 2px;
+        }
+        .modal input, .modal textarea {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1.5px solid #e5e7eb;
+            font-size: 1em;
+        }
+        .modal input[type="file"] {
+            border: none;
+        }
+        .modal .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .btn-cancelar {
+            background: #e5e7eb;
+            color: #374151;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .btn-guardar {
+            background: #667eea;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 10px 2vw;
+            }
+            .modal {
+                min-width: 0;
+                padding: 18px 6px 10px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <i class="fa-solid fa-champagne-glasses"></i> ADMINISTRAR MINIBAR
+    </div>
+    <div class="container">
+        <div class="crud-header">
+            <h2>Productos del minibar</h2>
+            <button class="btn-agregar" id="btnAgregar"><i class="fa fa-plus"></i> Agregar producto</button>
+        </div>
+        <div id="tabla-productos"></div>
+    </div>
+    <!-- Modal -->
+    <div class="modal-bg" id="modal-bg">
+        <div class="modal" id="modal">
+            <h3 id="modal-titulo">Agregar producto</h3>
+            <form id="formProducto">
+                <input type="hidden" id="item_id" name="item_id">
+                <label>Nombre:<input type="text" id="name" name="name" required></label>
+                <label>Descripción:<textarea id="description" name="description" rows="2" required></textarea></label>
+                <label>Precio:<input type="number" id="price" name="price" step="0.01" min="0" required></label>
+                <label>Stock:<input type="number" id="stock" name="stock" min="0" required></label>
+                <label>Categoría:<input type="text" id="category" name="category"></label>
+                <label>Imagen:<input type="file" id="imagen" name="imagen" accept="image/*"></label>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancelar" id="btnCancelar">Cancelar</button>
+                    <button type="submit" class="btn-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="assets/js/minibar_admin.js"></script>
+</body>
+</html>
