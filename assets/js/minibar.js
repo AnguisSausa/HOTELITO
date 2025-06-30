@@ -141,6 +141,11 @@ function calcularCambio() {
     localStorage.setItem('minibar_pago', pagado.toFixed(2));
     localStorage.setItem('minibar_cambio', cambio.toFixed(2));
 
+    // Guardar historial acumulativo de compras
+    let historial = JSON.parse(localStorage.getItem('minibar_historial')) || [];
+    historial.push(total);
+    localStorage.setItem('minibar_historial', JSON.stringify(historial));
+
     // SweetAlert para preguntar si quiere comprar algo más
     if (typeof Swal !== 'undefined') {
         Swal.fire({

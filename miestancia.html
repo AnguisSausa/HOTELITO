@@ -144,6 +144,25 @@
             box-shadow: 0 8px 32px rgba(102,126,234,0.18);
             color: #fff;
         }
+        .btn-terminar {
+            display: inline-block;
+            background: linear-gradient(90deg, #ef4444 0%, #f97316 100%);
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: 700;
+            padding: 1.1em 3em;
+            border-radius: 0.8em;
+            text-decoration: none;
+            box-shadow: 0 4px 18px rgba(239,68,68,0.13);
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn-terminar:hover {
+            background: linear-gradient(90deg, #f97316 0%, #ef4444 100%);
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 8px 32px rgba(239,68,68,0.18);
+            color: #fff;
+        }
         @media (max-width: 900px) {
             .container {
                 padding: 2vw 2vw;
@@ -202,7 +221,7 @@
             </div>
             <div class="cliente-section">
                 <div class="cliente-imagen">
-                    <img id="img-cliente" src="assets/imgs/default-user.png" alt="Imagen de usuario">
+                    <img id="img-cliente" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iNTAiIGZpbGw9IiM2NzdFRUEiLz4KPGNpcmNsZSBjeD0iNTAiIGN5PSIzNSIgcj0iMTUiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMCA4NUMzMCA3MCA0MCA2NSA1MCA2NUM2MCA2NSA3MCA3MCA4MCA4NUg4MUM4MSA5MCA3NiA5NSA3MCA5NUgzMEMyNCA5NSAxOSA5MCAxOSA4NUgyMFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" alt="Imagen de usuario">
                 </div>
                 <div class="cliente-datos">
                     <h2>Datos del cliente</h2>
@@ -231,8 +250,9 @@
                     </ul>
                 </div>
             </div>
-            <div style="width:100%;display:flex;justify-content:center;margin-top:1.2em;">
+            <div style="width:100%;display:flex;justify-content:center;margin-top:1.2em;gap:1em;flex-wrap:wrap;">
                 <a href="minibar.html" class="btn-minibar">Ir al Minibar</a>
+                <a href="terminar_reservacion.html" class="btn-terminar">Terminar Reservación</a>
             </div>
         </div>
     </div>
