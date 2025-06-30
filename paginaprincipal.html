@@ -422,29 +422,31 @@
     </style>
 </head>
 <body>
-    <div class="header-section">
-        <div class="principal-header">
-            <h1>Página Principal</h1>
-            <p>Bienvenido a nuestro hotel</p>
+    <div class="header-section" style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="flex:1;">
+            <div class="principal-header">
+                <h1>Página Principal - Hotel</h1>
+                <p>Bienvenido a la plataforma de gestión de tu estancia</p>
+            </div>
+            
+            <div class="user-welcome">
+                <div class="welcome-message" id="welcome-message">¡Hola!</div>
+                <h3>¡Hola <span id="user-name">Usuario</span>!</h3>
+                <p>Has iniciado sesión como <span id="user-type" class="client-badge">Cliente</span></p>
+            </div>
+            
+            <div class="principal-actions">
+                <a href="habitaciones.html" class="btn-principal btn-primary">
+                    <i class="fas fa-bed"></i> Ver Habitaciones
+                </a>
+                <a href="reservas.html" class="btn-principal btn-primary">
+                    <i class="fas fa-calendar-check"></i> Hacer Reserva
+                </a>
+            </div>
         </div>
-        
-        <div class="user-welcome">
-            <div class="welcome-message" id="welcome-message">¡Hola!</div>
-            <h3>¡Hola <span id="user-name">Usuario</span>!</h3>
-            <p>Has iniciado sesión como <span id="user-type" class="client-badge">Cliente</span></p>
-        </div>
-        
-        <div class="principal-actions">
-            <a href="habitaciones.html" class="btn-principal btn-primary">
-                <i class="fas fa-bed"></i> Ver Habitaciones
-            </a>
-            <a href="reservas.html" class="btn-principal btn-primary">
-                <i class="fas fa-calendar-check"></i> Hacer Reserva
-            </a>
-            <button onclick="cerrarSesion()" class="btn-principal btn-logout">
-                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-            </button>
-        </div>
+        <button class="btn-principal btn-logout" id="btn-logout" style="margin-left:auto;">
+            <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+        </button>
     </div>
     
     <!-- Sección de habitaciones disponibles -->
@@ -467,5 +469,11 @@
     </div>
 
     <script src="assets/js/paginaprincipal.js"></script>
+    <script>
+    document.getElementById('btn-logout').onclick = function() {
+        localStorage.clear();
+        window.location.href = 'index.html';
+    };
+    </script>
 </body>
 </html>

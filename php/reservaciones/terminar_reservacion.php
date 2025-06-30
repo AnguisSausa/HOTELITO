@@ -50,34 +50,8 @@ try {
     
     $reservacion = $resultado->fetch_assoc();
     
-    // Calcular total del minibar
-    $stmt = $conexion->prepare("
-        SELECT COALESCE(SUM(total_precio), 0) as total_minibar
-        FROM consumo 
-        WHERE reservations_id = ?
-    ");
-    $stmt->bind_param("i", $reservation_id);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    $total_minibar = $resultado->fetch_assoc()['total_minibar'];
-    
-    // Calcular total_spend: habitación + minibar
-    $total_spend = floatval($reservacion['total_precio']) + floatval($total_minibar);
-    
-    // Iniciar transacción
-    $conexion->begin_transaction();
-    
-    // Actualizar la reservación con total_spent y comentarios
-    $stmt = $conexion->prepare("
-        UPDATE reservations 
-        SET total_spent = ?, comentarios = ?, fecha_salida = CURRENT_TIMESTAMP
-        WHERE reservation_id = ?
-    ");
-    $stmt->bind_param("dsi", $total_spend, $comentarios, $reservation_id);
-    
-    if (!$stmt->execute()) {
-        throw new Exception('Error al actualizar la reservación');
-    }
+    // Usar el total_spent que llega desde el frontend (el mostrado en la página)
+    $total_spent = floatval($datos['total_spent'] ?? 0);
     
     // Cambiar el estado de la habitación a 'disponible'
     $stmt = $conexion->prepare("
@@ -86,33 +60,32 @@ try {
         WHERE room_id = ?
     ");
     $stmt->bind_param("i", $reservacion['rooms_id']);
-    
     if (!$stmt->execute()) {
         throw new Exception('Error al actualizar el estado de la habitación');
     }
-    
-    // Crear registro en la tabla historial con el total_spend completo y comentarios
+
+    // Iniciar transacción
+    $conexion->begin_transaction();
+
+    // Crear registro en la tabla historial con el total_spent recibido y comentarios
     $stmt = $conexion->prepare("
-        INSERT INTO historial (user_id, reservation_id, nights_stayes, total_spent, comentarios) 
+        INSERT INTO historial (user_id, reservation_id, nights_stayed, total_spent, comentarios) 
         VALUES (?, ?, ?, ?, ?)
     ");
-    $stmt->bind_param("iiids", $user_id, $reservation_id, $reservacion['num_noches'], $total_spend, $comentarios);
-    
+    $stmt->bind_param("iiids", $user_id, $reservation_id, $reservacion['num_noches'], $total_spent, $comentarios);
     if (!$stmt->execute()) {
         throw new Exception('Error al crear el registro en historial');
     }
-    
+
     // Confirmar transacción
     $conexion->commit();
-    
+
     echo json_encode([
         'success' => true,
         'message' => 'Reservación terminada exitosamente',
         'datos' => [
             'reservation_id' => $reservation_id,
-            'total_habitacion' => $reservacion['total_precio'],
-            'total_minibar' => $total_minibar,
-            'total_spend' => $total_spend,
+            'total_spend' => $total_spent,
             'comentarios' => $comentarios
         ]
     ]);
