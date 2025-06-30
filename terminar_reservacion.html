@@ -387,6 +387,12 @@
                 </div>
             </div>
 
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="monto-pagado"><i class="fas fa-money-bill-wave"></i> Monto con el que pagas</label>
+                <input type="number" id="monto-pagado" min="0" step="0.01" placeholder="Ingresa el monto en efectivo">
+            </div>
+            <div id="cambio" style="font-weight:bold;color:#059669;margin-bottom:20px;"></div>
+
             <div class="payment-status unpaid" id="payment-status">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>Pendiente de pago</span>
@@ -396,73 +402,27 @@
         <!-- Sección de Pago -->
         <div class="payment-section">
             <div class="payment-header">
-                <i class="fas fa-credit-card"></i>
+                <i class="fas fa-money-bill-wave"></i>
                 <h3>Método de Pago</h3>
             </div>
 
             <div class="payment-methods">
-                <div class="payment-method" onclick="seleccionarMetodoPago('tarjeta')">
-                    <input type="radio" name="payment-method" value="tarjeta" id="tarjeta">
-                    <i class="fas fa-credit-card"></i>
-                    <span>Tarjeta de Crédito/Débito</span>
-                </div>
-                <div class="payment-method" onclick="seleccionarMetodoPago('efectivo')">
-                    <input type="radio" name="payment-method" value="efectivo" id="efectivo">
+                <div class="payment-method selected">
+                    <input type="radio" name="payment-method" value="efectivo" id="efectivo" checked disabled>
                     <i class="fas fa-money-bill-wave"></i>
                     <span>Efectivo</span>
                 </div>
-                <div class="payment-method" onclick="seleccionarMetodoPago('transferencia')">
-                    <input type="radio" name="payment-method" value="transferencia" id="transferencia">
-                    <i class="fas fa-university"></i>
-                    <span>Transferencia Bancaria</span>
-                </div>
             </div>
 
-            <!-- Formulario de Tarjeta -->
-            <div class="payment-form" id="tarjeta-form">
-                <div class="card-details">
-                    <div class="form-group">
-                        <label for="card-number">Número de Tarjeta</label>
-                        <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19">
-                    </div>
-                    <div class="form-group">
-                        <label for="card-expiry">Vencimiento</label>
-                        <input type="text" id="card-expiry" placeholder="MM/AA" maxlength="5">
-                    </div>
-                    <div class="form-group">
-                        <label for="card-cvv">CVV</label>
-                        <input type="text" id="card-cvv" placeholder="123" maxlength="4">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="card-name">Nombre en la Tarjeta</label>
-                    <input type="text" id="card-name" placeholder="Juan Pérez">
-                </div>
-            </div>
-
-            <!-- Formulario de Efectivo -->
-            <div class="payment-form" id="efectivo-form">
+            <div class="payment-form active" id="efectivo-form">
                 <div class="form-group">
                     <label>Método de Pago</label>
                     <p style="margin: 0; color: #666;">Pago en efectivo al momento del check-out</p>
                 </div>
             </div>
 
-            <!-- Formulario de Transferencia -->
-            <div class="payment-form" id="transferencia-form">
-                <div class="form-group">
-                    <label>Datos Bancarios</label>
-                    <p style="margin: 0; color: #666;">
-                        Banco: Hotel Bank<br>
-                        Cuenta: 1234-5678-9012-3456<br>
-                        CLABE: 012345678901234567<br>
-                        Beneficiario: Hotel Premium
-                    </p>
-                </div>
-            </div>
-
-            <button class="pay-btn" id="pay-btn" disabled>
-                <i class="fas fa-credit-card"></i> Procesar Pago
+            <button class="pay-btn" id="pay-btn">
+                <i class="fas fa-money-bill-wave"></i> Procesar Pago
             </button>
         </div>
 

@@ -29,7 +29,28 @@ function verificarSesion() {
     }
 }
 
-// Cargar información de la reservación actual
+// Cargar costo del minibar desde localStorage (acumulativo)
+function cargarCostoMinibarDesdeLocalStorage() {
+    let minibarTotal = 0;
+    let minibarHistorial = localStorage.getItem('minibar_historial');
+    if (minibarHistorial) {
+        try {
+            const historial = JSON.parse(minibarHistorial);
+            if (Array.isArray(historial)) {
+                minibarTotal = historial.reduce((acc, val) => acc + (parseFloat(val) || 0), 0);
+            }
+        } catch (e) {
+            minibarTotal = 0;
+        }
+    } else {
+        // Compatibilidad: si solo existe minibar_total, lo suma una vez
+        const minibarSimple = localStorage.getItem('minibar_total');
+        if (minibarSimple) minibarTotal = parseFloat(minibarSimple) || 0;
+    }
+    return minibarTotal;
+}
+
+// Modificar cargarReservacionActual para usar el costo del minibar del localStorage
 async function cargarReservacionActual() {
     try {
         const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -39,7 +60,8 @@ async function cargarReservacionActual() {
         if (data.success) {
             reservacionActual = data.reservacion;
             costoHabitacion = parseFloat(data.reservacion.total_precio);
-            await cargarCostoMinibar();
+            // Usar el costo del minibar acumulado del localStorage
+            costoMinibar = cargarCostoMinibarDesdeLocalStorage();
             calcularTotalFinal();
             mostrarInformacionReservacion();
         } else {
@@ -58,23 +80,6 @@ async function cargarReservacionActual() {
     }
 }
 
-// Cargar costo del minibar
-async function cargarCostoMinibar() {
-    try {
-        const response = await fetch(`php/minibar/obtener_costo_minibar.php?reservation_id=${reservacionActual.reservation_id}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            costoMinibar = parseFloat(data.total_minibar);
-        } else {
-            costoMinibar = 0;
-        }
-    } catch (error) {
-        console.error('Error al cargar costo del minibar:', error);
-        costoMinibar = 0;
-    }
-}
-
 // Calcular total final
 function calcularTotalFinal() {
     totalFinal = costoHabitacion + costoMinibar;
@@ -88,7 +93,17 @@ function calcularTotalFinal() {
 // Mostrar información de la reservación
 function mostrarInformacionReservacion() {
     if (!reservacionActual) return;
-    
+    // Obtener la fecha de entrada desde localStorage
+    let reservacionLS = localStorage.getItem('reservacion_actual');
+    let fechaEntrada = reservacionActual.fecha_entrada;
+    if (reservacionLS) {
+        try {
+            const reservacionObj = JSON.parse(reservacionLS);
+            if (reservacionObj && (reservacionObj.fecha_entrada || reservacionObj.entrada)) {
+                fechaEntrada = reservacionObj.fecha_entrada || reservacionObj.entrada;
+            }
+        } catch (e) {}
+    }
     const detallesContainer = document.getElementById('reservation-details');
     detallesContainer.innerHTML = `
         <div class="detail-item">
@@ -97,7 +112,7 @@ function mostrarInformacionReservacion() {
         </div>
         <div class="detail-item">
             <i class="fas fa-calendar-alt"></i>
-            <span>Fecha de entrada: ${formatearFecha(reservacionActual.fecha_entrada)}</span>
+            <span>Fecha de entrada: ${formatearFecha(fechaEntrada)}</span>
         </div>
         <div class="detail-item">
             <i class="fas fa-moon"></i>
@@ -114,146 +129,48 @@ function mostrarInformacionReservacion() {
 function configurarEventos() {
     document.getElementById('pay-btn').addEventListener('click', procesarPago);
     document.getElementById('terminate-btn').addEventListener('click', terminarReservacion);
-    
-    // Configurar formato de tarjeta
-    document.getElementById('card-number').addEventListener('input', formatearNumeroTarjeta);
-    document.getElementById('card-expiry').addEventListener('input', formatearFechaVencimiento);
-    document.getElementById('card-cvv').addEventListener('input', formatearCVV);
-}
-
-// Seleccionar método de pago
-function seleccionarMetodoPago(metodo) {
-    // Desmarcar todos los métodos
-    document.querySelectorAll('.payment-method').forEach(el => {
-        el.classList.remove('selected');
-    });
-    
-    // Ocultar todos los formularios
-    document.querySelectorAll('.payment-form').forEach(el => {
-        el.classList.remove('active');
-    });
-    
-    // Marcar el método seleccionado
-    document.getElementById(metodo).checked = true;
-    document.getElementById(metodo).parentElement.classList.add('selected');
-    
-    // Mostrar el formulario correspondiente
-    document.getElementById(`${metodo}-form`).classList.add('active');
-    
-    // Habilitar botón de pago
-    document.getElementById('pay-btn').disabled = false;
-}
-
-// Formatear número de tarjeta
-function formatearNumeroTarjeta(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-    e.target.value = value;
-}
-
-// Formatear fecha de vencimiento
-function formatearFechaVencimiento(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length >= 2) {
-        value = value.substring(0, 2) + '/' + value.substring(2, 4);
-    }
-    e.target.value = value;
-}
-
-// Formatear CVV
-function formatearCVV(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    e.target.value = value;
 }
 
 // Procesar pago
 async function procesarPago() {
-    const metodoPago = document.querySelector('input[name="payment-method"]:checked').value;
-    
-    // Validar formulario según el método
-    if (metodoPago === 'tarjeta') {
-        if (!validarFormularioTarjeta()) {
-            return;
-        }
+    // Obtener el monto pagado
+    const montoPagadoInput = document.getElementById('monto-pagado');
+    const cambioDiv = document.getElementById('cambio');
+    const montoPagado = parseFloat(montoPagadoInput.value);
+    if (isNaN(montoPagado) || montoPagado < totalFinal) {
+        cambioDiv.textContent = 'El monto pagado es insuficiente.';
+        cambioDiv.style.color = '#e53e3e';
+        pagoRealizado = false;
+        document.getElementById('terminate-btn').disabled = true;
+        return;
     }
-    
+    const cambio = montoPagado - totalFinal;
+    cambioDiv.textContent = `Cambio: $${cambio.toFixed(2)}`;
+    cambioDiv.style.color = '#059669';
+    pagoRealizado = true;
+    document.getElementById('terminate-btn').disabled = false;
+
     // Mostrar loading
     const payBtn = document.getElementById('pay-btn');
     const originalText = payBtn.innerHTML;
     payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
     payBtn.disabled = true;
-    
-    try {
-        // Simular procesamiento de pago
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // En un sistema real, aquí se procesaría el pago con el proveedor
-        const pagoExitoso = true; // Simular pago exitoso
-        
-        if (pagoExitoso) {
-            pagoRealizado = true;
-            
-            // Actualizar estado de pago
-            document.getElementById('payment-status').className = 'payment-status paid';
-            document.getElementById('payment-status').innerHTML = `
-                <i class="fas fa-check-circle"></i>
-                <span>Pago realizado exitosamente</span>
-            `;
-            
-            // Habilitar botón de terminar
-            document.getElementById('terminate-btn').disabled = false;
-            
-            // Ocultar sección de pago
-            document.querySelector('.payment-section').style.display = 'none';
-            
-            Swal.fire({
-                title: '¡Pago Exitoso!',
-                text: 'Tu pago ha sido procesado correctamente',
-                icon: 'success',
-                confirmButtonColor: '#28a745'
-            });
-            
-            // Actualizar información de la reservación
-            mostrarInformacionReservacion();
-        }
-    } catch (error) {
-        console.error('Error al procesar pago:', error);
-        mostrarError('Error al procesar el pago. Inténtalo de nuevo.');
-    } finally {
-        // Restaurar botón
-        payBtn.innerHTML = originalText;
-        payBtn.disabled = false;
-    }
-}
-
-// Validar formulario de tarjeta
-function validarFormularioTarjeta() {
-    const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
-    const cardExpiry = document.getElementById('card-expiry').value;
-    const cardCvv = document.getElementById('card-cvv').value;
-    const cardName = document.getElementById('card-name').value.trim();
-    
-    if (cardNumber.length < 13 || cardNumber.length > 19) {
-        mostrarError('Número de tarjeta inválido');
-        return false;
-    }
-    
-    if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-        mostrarError('Fecha de vencimiento inválida (formato: MM/AA)');
-        return false;
-    }
-    
-    if (cardCvv.length < 3 || cardCvv.length > 4) {
-        mostrarError('CVV inválido');
-        return false;
-    }
-    
-    if (cardName.length < 3) {
-        mostrarError('Nombre en la tarjeta es requerido');
-        return false;
-    }
-    
-    return true;
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    document.getElementById('payment-status').className = 'payment-status paid';
+    document.getElementById('payment-status').innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>Pago realizado exitosamente</span>
+    `;
+    document.querySelector('.payment-section').style.display = 'none';
+    Swal.fire({
+        title: '¡Pago Exitoso!',
+        text: 'Tu pago ha sido procesado correctamente',
+        icon: 'success',
+        confirmButtonColor: '#28a745'
+    });
+    mostrarInformacionReservacion();
+    payBtn.innerHTML = originalText;
+    payBtn.disabled = false;
 }
 
 // Terminar reservación
@@ -262,9 +179,11 @@ async function terminarReservacion() {
         mostrarError('Debes realizar el pago antes de terminar la reservación');
         return;
     }
-    
     const comentarios = document.getElementById('comentarios').value.trim();
-    
+    if (!comentarios) {
+        mostrarError('Por favor, escribe un comentario sobre tu experiencia. El campo de comentarios es obligatorio.');
+        return;
+    }
     // Confirmar terminación
     const result = await Swal.fire({
         title: '¿Terminar Reservación?',
@@ -276,18 +195,15 @@ async function terminarReservacion() {
         confirmButtonText: 'Sí, terminar',
         cancelButtonText: 'Cancelar'
     });
-    
     if (result.isConfirmed) {
         try {
             const usuario = JSON.parse(localStorage.getItem('usuario'));
-            
             const datos = {
                 user_id: usuario.id,
                 reservation_id: reservacionActual.reservation_id,
                 total_spent: totalFinal,
                 comentarios: comentarios
             };
-            
             const response = await fetch('php/reservaciones/terminar_reservacion.php', {
                 method: 'POST',
                 headers: {
@@ -295,9 +211,7 @@ async function terminarReservacion() {
                 },
                 body: JSON.stringify(datos)
             });
-            
             const data = await response.json();
-            
             if (data.success) {
                 Swal.fire({
                     title: '¡Reservación Terminada!',
@@ -307,7 +221,6 @@ async function terminarReservacion() {
                 }).then(() => {
                     // Limpiar datos de sesión de reservación
                     localStorage.removeItem('reservacion_activa');
-                    
                     // Redirigir a página principal
                     window.location.href = 'paginaprincipal.html';
                 });
@@ -323,11 +236,33 @@ async function terminarReservacion() {
 
 // Funciones auxiliares
 function formatearFecha(fecha) {
-    return new Date(fecha).toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    if (!fecha) return '';
+    // Si es formato YYYY-MM-DD o YYYY-MM-DD HH:MM:SS
+    if (/^\d{4}-\d{2}-\d{2}/.test(fecha)) {
+        let f = fecha.replace(' ', 'T');
+        let d = new Date(f);
+        if (!isNaN(d.getTime())) {
+            return d.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+    }
+    // Si es formato DD/MM/YYYY
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
+        const [dia, mes, anio] = fecha.split('/');
+        const d = new Date(`${anio}-${mes}-${dia}`);
+        if (!isNaN(d.getTime())) {
+            return d.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+    }
+    // Si es formato MM/DD/YYYY
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
+        const [mes, dia, anio] = fecha.split('/');
+        const d = new Date(`${anio}-${mes}-${dia}`);
+        if (!isNaN(d.getTime())) {
+            return d.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+    }
+    // Si no se pudo parsear, regresa el string original
+    return fecha;
 }
 
 function mostrarError(mensaje) {
