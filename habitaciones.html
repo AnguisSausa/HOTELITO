@@ -7,161 +7,264 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/habitaciones.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f7f7fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .sidebar-slider {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            transition: width 0.25s cubic-bezier(.4,2,.6,1);
+            z-index: 100;
+            box-shadow: 2px 0 16px rgba(102,126,234,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sidebar-slider:hover, .sidebar-slider:focus-within {
+            width: 220px;
+        }
+        .sidebar-logo {
+            margin: 32px 0 24px 0;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-slider nav {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin: 0 8px;
+            transition: background 0.18s, color 0.18s;
+            white-space: nowrap;
+        }
+        .sidebar-link .fa {
+            font-size: 1.3em;
+            min-width: 24px;
+            text-align: center;
+        }
+        .sidebar-link.active, .sidebar-link:hover {
+            background: rgba(255,255,255,0.13);
+            color: #ffe066;
+        }
+        .sidebar-label {
+            opacity: 0;
+            transition: opacity 0.18s;
+            pointer-events: none;
+        }
+        .sidebar-slider:hover .sidebar-label, .sidebar-slider:focus-within .sidebar-label {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        @media (max-width: 700px) {
+            .sidebar-slider { width: 48px; }
+            .sidebar-slider:hover, .sidebar-slider:focus-within { width: 160px; }
+        }
+        .main-content {
+            margin-left: 60px;
+            transition: margin-left 0.25s cubic-bezier(.4,2,.6,1);
+            padding: 32px 18px 18px 18px;
+            width: 75vw;
+            max-width: 1200px;
+            margin-right: auto;
+            margin-top: 0;
+        }
+        .sidebar-slider:hover ~ .main-content, .sidebar-slider:focus-within ~ .main-content {
+            margin-left: 220px;
+        }
+        @media (max-width: 700px) {
+            .main-content { margin-left: 48px; width: 98vw; }
+            .sidebar-slider:hover ~ .main-content, .sidebar-slider:focus-within ~ .main-content { margin-left: 160px; }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1><i class="fas fa-bed"></i> Gestión de Habitaciones</h1>
-            <button class="btn btn-primary" id="btnNuevaHabitacion">
-                <i class="fas fa-plus"></i> Nueva Habitación
-            </button>
-        </header>
-
-        <!-- Barra de búsqueda -->
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Buscar habitaciones...">
-            </div>
-            <div class="filter-options">
-                <select id="filterType">
-                    <option value="">Todos los tipos</option>
-                    <option value="Individual">Individual</option>
-                    <option value="pareja">pareja</option>
-                    <option value="Suite">Suite</option>
-                    <option value="Familiar">Familiar</option>
-                </select>
-                <select id="filterStatus">
-                    <option value="">Todos los estados</option>
-                    <option value="Disponible">Disponible</option>
-                    <option value="Ocupada">Ocupada</option>
-                    <option value="Mantenimiento">Mantenimiento</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Formulario de habitación (oculto por defecto) -->
-        <div id="habitacionForm" class="form-container" style="display: none;">
-            <div class="form-header">
-                <h2 id="formTitle">Nueva Habitación</h2>
-                <button class="btn-close" id="btnCerrarFormulario">
-                    <i class="fas fa-times"></i>
+    <div class="sidebar-slider">
+        <div class="sidebar-logo"><i class="fa fa-bed"></i></div>
+        <nav>
+            <a href="home.html" class="sidebar-link"><i class="fa fa-gauge"></i><span class="sidebar-label">Dashboard</span></a>
+            <a href="paginaprincipal.html" class="sidebar-link"><i class="fa fa-home"></i><span class="sidebar-label">Principal</span></a>
+            <a href="habitaciones.html" class="sidebar-link active"><i class="fa fa-bed"></i><span class="sidebar-label">Habitaciones</span></a>
+            <a href="minibar_admin.html" class="sidebar-link"><i class="fa fa-champagne-glasses"></i><span class="sidebar-label">Minibar</span></a>
+            <a href="usuarios.html" class="sidebar-link"><i class="fa fa-user"></i><span class="sidebar-label">Usuarios</span></a>
+            <a href="reservaciones.html" class="sidebar-link"><i class="fa fa-calendar-check"></i><span class="sidebar-label">Reservaciones</span></a>
+            <a href="historial.html" class="sidebar-link"><i class="fa fa-file-alt"></i><span class="sidebar-label">Historial</span></a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <header class="header">
+                <h1><i class="fas fa-bed"></i> Gestión de Habitaciones</h1>
+                <button class="btn btn-primary" id="btnNuevaHabitacion">
+                    <i class="fas fa-plus"></i> Nueva Habitación
                 </button>
-            </div>
-            <form id="habitacionFormElement" enctype="multipart/form-data">
-                <input type="hidden" id="room_id" name="room_id">
-                
-                <div class="form-group">
-                    <label for="room_number">Número de Habitación:</label>
-                    <input type="number" id="room_number" name="room_number" required>
-                </div>
+            </header>
 
-                <div class="form-group">
-                    <label for="room_type">Tipo de Habitación:</label>
-                    <select id="room_type" name="room_type" required>
-                        <option value="">Seleccionar tipo</option>
+            <!-- Barra de búsqueda -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar habitaciones...">
+                </div>
+                <div class="filter-options">
+                    <select id="filterType">
+                        <option value="">Todos los tipos</option>
                         <option value="Individual">Individual</option>
                         <option value="pareja">pareja</option>
                         <option value="Suite">Suite</option>
                         <option value="Familiar">Familiar</option>
                     </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="description">Descripción:</label>
-                    <textarea id="description" name="description" rows="3" required></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="capacity">Capacidad:</label>
-                        <input type="number" id="capacity" name="capacity" min="1" max="10" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="precio_noche">Precio por Noche:</label>
-                        <input type="number" id="precio_noche" name="precio_noche" step="0.01" min="0" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="status">Estado:</label>
-                    <select id="status" name="status" required>
-                        <option value="">Seleccionar estado</option>
+                    <select id="filterStatus">
+                        <option value="">Todos los estados</option>
                         <option value="Disponible">Disponible</option>
                         <option value="Ocupada">Ocupada</option>
                         <option value="Mantenimiento">Mantenimiento</option>
                     </select>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="imagen">Imagen de la Habitación:</label>
-                    <input type="file" id="imagen" name="imagen" accept="image/*">
-                    <div id="imagenPreview" class="imagen-preview"></div>
+            <!-- Formulario de habitación (oculto por defecto) -->
+            <div id="habitacionForm" class="form-container" style="display: none;">
+                <div class="form-header">
+                    <h2 id="formTitle">Nueva Habitación</h2>
+                    <button class="btn-close" id="btnCerrarFormulario">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="habitacionFormElement" enctype="multipart/form-data">
+                    <input type="hidden" id="room_id" name="room_id">
+                    
+                    <div class="form-group">
+                        <label for="room_number">Número de Habitación:</label>
+                        <input type="number" id="room_number" name="room_number" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="room_type">Tipo de Habitación:</label>
+                        <select id="room_type" name="room_type" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Individual">Individual</option>
+                            <option value="pareja">pareja</option>
+                            <option value="Suite">Suite</option>
+                            <option value="Familiar">Familiar</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Descripción:</label>
+                        <textarea id="description" name="description" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="capacity">Capacidad:</label>
+                            <input type="number" id="capacity" name="capacity" min="1" max="10" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="precio_noche">Precio por Noche:</label>
+                            <input type="number" id="precio_noche" name="precio_noche" step="0.01" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Estado:</label>
+                        <select id="status" name="status" required>
+                            <option value="">Seleccionar estado</option>
+                            <option value="Disponible">Disponible</option>
+                            <option value="Ocupada">Ocupada</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imagen">Imagen de la Habitación:</label>
+                        <input type="file" id="imagen" name="imagen" accept="image/*">
+                        <div id="imagenPreview" class="imagen-preview"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btnCancelarFormulario">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabla de habitaciones -->
+            <div class="table-container">
+                <div id="loadingMessage" class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando habitaciones...
+                </div>
+                
+                <div id="noDataMessage" class="no-data" style="display: none;">
+                    <i class="fas fa-bed"></i>
+                    <p>No se encontraron habitaciones</p>
                 </div>
 
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Guardar
+                <table id="habitacionesTable" class="data-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Capacidad</th>
+                            <th>Precio/Noche</th>
+                            <th>Estado</th>
+                            <th>Imagen</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="habitacionesTableBody">
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación para eliminar -->
+        <div id="deleteModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Confirmar Eliminación</h3>
+                    <button class="btn-close" id="btnCerrarModal">
+                        <i class="fas fa-times"></i>
                     </button>
-                    <button type="button" class="btn btn-secondary" id="btnCancelarFormulario">
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar la habitación <strong id="deleteRoomNumber"></strong>?</p>
+                    <p>Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" id="btnConfirmarEliminar">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                    <button class="btn btn-secondary" id="btnCancelarEliminar">
                         <i class="fas fa-times"></i> Cancelar
                     </button>
                 </div>
-            </form>
-        </div>
-
-        <!-- Tabla de habitaciones -->
-        <div class="table-container">
-            <div id="loadingMessage" class="loading">
-                <i class="fas fa-spinner fa-spin"></i> Cargando habitaciones...
-            </div>
-            
-            <div id="noDataMessage" class="no-data" style="display: none;">
-                <i class="fas fa-bed"></i>
-                <p>No se encontraron habitaciones</p>
-            </div>
-
-            <table id="habitacionesTable" class="data-table" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Tipo</th>
-                        <th>Descripción</th>
-                        <th>Capacidad</th>
-                        <th>Precio/Noche</th>
-                        <th>Estado</th>
-                        <th>Imagen</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="habitacionesTableBody">
-                    <!-- Los datos se cargarán dinámicamente -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Modal de confirmación para eliminar -->
-    <div id="deleteModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Confirmar Eliminación</h3>
-                <button class="btn-close" id="btnCerrarModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar la habitación <strong id="deleteRoomNumber"></strong>?</p>
-                <p>Esta acción no se puede deshacer.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" id="btnConfirmarEliminar">
-                    <i class="fas fa-trash"></i> Eliminar
-                </button>
-                <button class="btn btn-secondary" id="btnCancelarEliminar">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
             </div>
         </div>
     </div>

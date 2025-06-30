@@ -10,6 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         case 'list':
             listarProductos($conexion);
             break;
+        case 'count':
+            contarMinibar($conexion);
+            break;
         default:
             echo json_encode(['success' => false, 'error' => 'Acción no válida']);
     }
@@ -80,4 +83,10 @@ function editarProducto($conexion, $data) {
         echo json_encode(['success' => false, 'error' => $stmt->error]);
     }
     $stmt->close();
+}
+
+function contarMinibar($conexion) {
+    $result = $conexion->query("SELECT COUNT(*) as count FROM minibaritems");
+    $row = $result->fetch_assoc();
+    echo json_encode(['success' => true, 'count' => intval($row['count'])]);
 } 

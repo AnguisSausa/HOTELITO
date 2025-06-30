@@ -10,8 +10,13 @@
         body {
             margin: 0;
             padding: 0;
-            background: #f7f8fc;
-            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+            background: #f7f7fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .main-content {
+            margin-left: 60px;
+            transition: margin-left 0.25s cubic-bezier(.4,2,.6,1);
+            padding: 32px 18px 18px 18px;
         }
         .main-header {
             position: fixed;
@@ -216,32 +221,34 @@
     </style>
 </head>
 <body>
-    <header class="main-header">
-        <div class="header-content">
-            <div class="hotel-title">
-                <i class="fas fa-hotel"></i> Paraiso Perdido
+    <div class="main-content">
+        <header class="main-header">
+            <div class="header-content">
+                <div class="hotel-title">
+                    <i class="fas fa-hotel"></i> Paraiso Perdido
+                </div>
+                <div class="header-user">
+                    <span id="nombre-cliente"></span>
+                    <button id="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+                </div>
             </div>
-            <div class="header-user">
-                <span id="nombre-cliente"></span>
-                <button id="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
-            </div>
-        </div>
-    </header>
-    <main class="main-content">
-        <section>
-            <div class="habitaciones-header">
-                <h2><i class="fas fa-bed"></i> Habitaciones Disponibles</h2>
-                <p>Explora nuestras habitaciones y encuentra la perfecta para tu estadía</p>
-            </div>
-            <div id="loading-habitaciones" style="text-align:center; margin:2em 0;">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Cargando habitaciones disponibles...</p>
-            </div>
-            <div class="habitaciones-grid" id="habitaciones-container">
-                <!-- Las habitaciones se cargarán dinámicamente aquí -->
-            </div>
-        </section>
-    </main>
+        </header>
+        <main>
+            <section>
+                <div class="habitaciones-header">
+                    <h2><i class="fas fa-bed"></i> Habitaciones Disponibles</h2>
+                    <p>Explora nuestras habitaciones y encuentra la perfecta para tu estadía</p>
+                </div>
+                <div id="loading-habitaciones" style="text-align:center; margin:2em 0;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando habitaciones disponibles...</p>
+                </div>
+                <div class="habitaciones-grid" id="habitaciones-container">
+                    <!-- Las habitaciones se cargarán dinámicamente aquí -->
+                </div>
+            </section>
+        </main>
+    </div>
     <script src="assets/js/paginaprincipal.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {

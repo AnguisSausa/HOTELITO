@@ -7,173 +7,377 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .home-container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            width: 100%;
-            max-width: 800px;
-            margin: 20px auto;
+        html, body, * {
+            box-sizing: border-box;
         }
-        
-        .home-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e1e5e9;
+        body {
+            background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
-        
-        .home-header h1 {
-            color: #333;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .container {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
-        
-        .user-welcome {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .user-welcome h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .user-type-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-        
-        .admin-badge {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-        }
-        
-        .client-badge {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-        }
-        
-        .home-actions {
+        .dashboard-wrapper {
             display: flex;
-            gap: 15px;
+            min-height: 90vh;
+            width: 75vw;
+            max-width: 1200px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.10);
+        }
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            width: 200px;
+            min-width: 180px;
+            max-width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 36px 0 24px 0;
+            box-shadow: 2px 0 16px rgba(102,126,234,0.08);
+        }
+        .user-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fff 60%, #a5b4fc 100%);
+            display: flex;
+            align-items: center;
             justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 12px rgba(102,126,234,0.10);
+        }
+        .avatar::before {
+            content: '\1F464';
+            font-size: 2.5rem;
+            color: #667eea;
+        }
+        .user-info {
+            text-align: center;
+        }
+        #sidebar-user-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+        #sidebar-user-email {
+            font-size: 0.95rem;
+            color: #e0e7ff;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            width: 100%;
+            margin-top: 30px;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.08rem;
+            padding: 12px 36px;
+            border-radius: 18px 0 0 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.18s, color 0.18s;
+        }
+        .nav-link.active, .nav-link:hover {
+            background: rgba(255,255,255,0.13);
+            color: #ffe066;
+        }
+        .dashboard-main {
+            flex: 1 1 0%;
+            padding: 48px 56px 32px 56px;
+            background: #f8fafc;
+            min-width: 0;
+        }
+        .dashboard-title {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 36px;
+            letter-spacing: 0.5px;
+        }
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 32px;
+        }
+        .dashboard-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(102,126,234,0.10);
+            padding: 32px 18px 26px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.18s, box-shadow 0.18s;
+            border: 2px solid transparent;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(102,126,234,0.18);
+            border-color: #667eea;
+        }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 18px;
+            letter-spacing: 0.2px;
+        }
+        .card-count {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: #374151;
+            margin-bottom: 2px;
+        }
+        .dashboard-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 38px;
             flex-wrap: wrap;
         }
-        
-        .btn-home {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
+        .summary-item {
+            background: linear-gradient(135deg, #e0e7ff 60%, #fff 100%);
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(102,126,234,0.08);
+            padding: 18px 32px 14px 24px;
+            display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 18px;
+            min-width: 180px;
+            flex: 1 1 180px;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .summary-icon {
+            font-size: 2.2rem;
+            color: #667eea;
+            background: #f1f5ff;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        .summary-label {
+            font-size: 1.05rem;
+            color: #374151;
+            font-weight: 600;
         }
-        
-        .btn-logout {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #764ba2;
         }
-        
-        .btn-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        .dashboard-card {
+            position: relative;
+        }
+        .card-icon {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 900px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+                min-height: unset;
+                width: 98vw;
+                margin: 18px auto;
+            }
+            .container {
+                padding: 0;
+            }
+            .dashboard-main {
+                padding: 24px 8vw 18px 8vw;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: unset;
+                max-width: unset;
+                flex-direction: row;
+                justify-content: flex-start;
+                align-items: flex-start;
+                padding: 18px 0 10px 0;
+                box-shadow: none;
+                border-radius: 0 0 18px 18px;
+            }
+            .sidebar-nav {
+                flex-direction: row;
+                gap: 8px;
+                margin-top: 0;
+                width: auto;
+            }
+            .nav-link {
+                border-radius: 12px;
+                padding: 10px 16px;
+                font-size: 1rem;
+            }
+            .user-profile {
+                flex-direction: row;
+                margin-bottom: 0;
+                margin-right: 18px;
+            }
+            .avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 1.3rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .dashboard-wrapper {
+                width: 100vw;
+                border-radius: 0;
+                margin: 0;
+            }
+            .container {
+                padding: 0;
+            }
+            .dashboard-main {
+                padding: 12px 2vw 8px 2vw;
+            }
+            .dashboard-title {
+                font-size: 1.3rem;
+                margin-bottom: 18px;
+            }
+            .dashboard-cards {
+                gap: 14px;
+            }
+            .dashboard-card {
+                padding: 18px 8px 14px 8px;
+            }
+            .sidebar {
+                padding: 8px 0 6px 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="home-container">
-            <div class="home-header">
-                <h1>Panel de Administrador</h1>
-                <p>Gestiona el sistema del hotel</p>
-            </div>
-            
-            <div class="user-welcome">
-                <h3>¡Hola <span id="user-name">Usuario</span>!</h3>
-                <p>Has iniciado sesión como administrador</p>
-                <div id="user-type-badge" class="user-type-badge admin-badge">Administrador</div>
-            </div>
-            
-            <div class="home-actions">
-                <a href="registro.html" class="btn-home btn-primary">Registrar Nuevo Usuario</a>
-                <a href="#" class="btn-home btn-primary">Gestionar Habitaciones</a>
-                <button onclick="cerrarSesion()" class="btn-home btn-logout">Cerrar Sesión</button>
-            </div>
+        <div class="dashboard-wrapper">
+            <aside class="sidebar">
+                <div class="user-profile">
+                    <div class="avatar"></div>
+                    <div class="user-info">
+                        <div id="sidebar-user-name">Admin</div>
+                        <div class="user-email" id="sidebar-user-email">admin@hotel.com</div>
+                    </div>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="home.html" class="nav-link active"><span>🏠</span> Inicio</a>
+                    <a href="habitaciones.html" class="nav-link"><span>🛏️</span> Habitaciones</a>
+                    <a href="minibar_admin.html" class="nav-link"><span>🍹</span> Minibar</a>
+                    <a href="usuarios.html" class="nav-link"><span>👤</span> Usuarios</a>
+                    <a href="reservaciones.html" class="nav-link"><span>📅</span> Reservaciones</a>
+                    <a href="historial.html" class="nav-link"><span>📜</span> Historial</a>
+                </nav>
+            </aside>
+            <main class="dashboard-main">
+                <h2 class="dashboard-title">Dashboard Administrador</h2>
+                <div class="dashboard-summary">
+                    <div class="summary-item">
+                        <div class="summary-icon">🛏️</div>
+                        <div>
+                            <div class="summary-label">Habitaciones</div>
+                            <div class="summary-value" id="summary-habitaciones">-</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon">🍹</div>
+                        <div>
+                            <div class="summary-label">Minibar</div>
+                            <div class="summary-value" id="summary-minibar">-</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon">👤</div>
+                        <div>
+                            <div class="summary-label">Usuarios</div>
+                            <div class="summary-value" id="summary-usuarios">-</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon">📅</div>
+                        <div>
+                            <div class="summary-label">Reservaciones</div>
+                            <div class="summary-value" id="summary-reservaciones">-</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon">📜</div>
+                        <div>
+                            <div class="summary-label">Historial</div>
+                            <div class="summary-value" id="summary-historial">-</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-cards">
+                    <div class="dashboard-card" onclick="location.href='habitaciones.html'">
+                        <div class="card-icon">🛏️</div>
+                        <div class="card-title">Habitaciones</div>
+                        <div class="card-count" id="count-habitaciones">-</div>
+                    </div>
+                    <div class="dashboard-card" onclick="location.href='minibar_admin.html'">
+                        <div class="card-icon">🍹</div>
+                        <div class="card-title">Minibar</div>
+                        <div class="card-count" id="count-minibar">-</div>
+                    </div>
+                    <div class="dashboard-card" onclick="location.href='usuarios.html'">
+                        <div class="card-icon">👤</div>
+                        <div class="card-title">Usuarios</div>
+                        <div class="card-count" id="count-usuarios">-</div>
+                    </div>
+                    <div class="dashboard-card" onclick="location.href='reservaciones.html'">
+                        <div class="card-icon">📅</div>
+                        <div class="card-title">Reservaciones</div>
+                        <div class="card-count" id="count-reservaciones">-</div>
+                    </div>
+                    <div class="dashboard-card" onclick="location.href='historial.html'">
+                        <div class="card-icon">📜</div>
+                        <div class="card-title">Historial</div>
+                        <div class="card-count" id="count-historial">-</div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
-
+    <script src="assets/js/dashboard_counts.js"></script>
     <script>
-        // Cargar información del usuario desde localStorage
+        // Eliminar bloque innecesario que accede a elementos inexistentes
+        // Sincronizar los valores del resumen visual con los contadores
         document.addEventListener('DOMContentLoaded', function() {
-            const usuario = JSON.parse(localStorage.getItem('usuario'));
-            
-            if (!usuario) {
-                window.location.href = 'index.html';
-                return;
+            function syncSummary(id, summaryId) {
+                const el = document.getElementById(id);
+                const summaryEl = document.getElementById(summaryId);
+                if (el && summaryEl) summaryEl.textContent = el.textContent;
             }
-            
-            // Mostrar información del usuario
-            document.getElementById('user-name').textContent = usuario.nombre || 'Usuario';
-            
-            const badgeElement = document.getElementById('user-type-badge');
-            if (usuario.tipo === 'admin') {
-                badgeElement.textContent = 'Administrador';
-                badgeElement.className = 'user-type-badge admin-badge';
-            } else {
-                badgeElement.textContent = 'Cliente';
-                badgeElement.className = 'user-type-badge client-badge';
-            }
+            setTimeout(() => {
+                syncSummary('count-habitaciones', 'summary-habitaciones');
+                syncSummary('count-minibar', 'summary-minibar');
+                syncSummary('count-usuarios', 'summary-usuarios');
+                syncSummary('count-reservaciones', 'summary-reservaciones');
+                syncSummary('count-historial', 'summary-historial');
+            }, 600);
         });
-        
-        function cerrarSesion() {
-            Swal.fire({
-                title: '¿Cerrar sesión?',
-                text: '¿Estás seguro de que quieres cerrar sesión?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, cerrar sesión',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('usuario');
-                    Swal.fire('¡Sesión cerrada!', 'Has cerrado sesión exitosamente', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1500);
-                }
-            });
-        }
     </script>
 </body>
 </html> 

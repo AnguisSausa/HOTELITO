@@ -8,10 +8,86 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%);
-            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background: #f7f7fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .sidebar-slider {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            transition: width 0.25s cubic-bezier(.4,2,.6,1);
+            z-index: 100;
+            box-shadow: 2px 0 16px rgba(102,126,234,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sidebar-slider:hover, .sidebar-slider:focus-within {
+            width: 220px;
+        }
+        .sidebar-logo {
+            margin: 32px 0 24px 0;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-slider nav {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin: 0 8px;
+            transition: background 0.18s, color 0.18s;
+            white-space: nowrap;
+        }
+        .sidebar-link .fa {
+            font-size: 1.3em;
+            min-width: 24px;
+            text-align: center;
+        }
+        .sidebar-link.active, .sidebar-link:hover {
+            background: rgba(255,255,255,0.13);
+            color: #ffe066;
+        }
+        .sidebar-label {
+            opacity: 0;
+            transition: opacity 0.18s;
+            pointer-events: none;
+        }
+        .sidebar-slider:hover .sidebar-label, .sidebar-slider:focus-within .sidebar-label {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        @media (max-width: 700px) {
+            .sidebar-slider { width: 48px; }
+            .sidebar-slider:hover, .sidebar-slider:focus-within { width: 160px; }
+        }
+        .main-content {
+            margin-left: 60px;
+            transition: margin-left 0.25s cubic-bezier(.4,2,.6,1);
+            padding: 32px 18px 18px 18px;
+        }
+        .sidebar-slider:hover ~ .main-content, .sidebar-slider:focus-within ~ .main-content {
+            margin-left: 220px;
+        }
+        @media (max-width: 700px) {
+            .main-content { margin-left: 48px; }
+            .sidebar-slider:hover ~ .main-content, .sidebar-slider:focus-within ~ .main-content { margin-left: 160px; }
         }
         .historial-container {
             max-width: 900px;
@@ -69,10 +145,24 @@
     </style>
 </head>
 <body>
-    <div class="historial-container">
-        <h1>Historial de Reservaciones</h1>
-        <div class="tarjetas-historial" id="tarjetas-historial">
-            <!-- Tarjetas se cargarán aquí -->
+    <div class="sidebar-slider">
+        <div class="sidebar-logo"><i class="fa fa-file-alt"></i></div>
+        <nav>
+            <a href="home.html" class="sidebar-link"><i class="fa fa-gauge"></i><span class="sidebar-label">Dashboard</span></a>
+            <a href="paginaprincipal.html" class="sidebar-link"><i class="fa fa-home"></i><span class="sidebar-label">Principal</span></a>
+            <a href="habitaciones.html" class="sidebar-link"><i class="fa fa-bed"></i><span class="sidebar-label">Habitaciones</span></a>
+            <a href="minibar_admin.html" class="sidebar-link"><i class="fa fa-champagne-glasses"></i><span class="sidebar-label">Minibar</span></a>
+            <a href="usuarios.html" class="sidebar-link"><i class="fa fa-user"></i><span class="sidebar-label">Usuarios</span></a>
+            <a href="reservaciones.html" class="sidebar-link"><i class="fa fa-calendar-check"></i><span class="sidebar-label">Reservaciones</span></a>
+            <a href="historial.html" class="sidebar-link active"><i class="fa fa-file-alt"></i><span class="sidebar-label">Historial</span></a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="historial-container">
+            <h1>Historial de Reservaciones</h1>
+            <div class="tarjetas-historial" id="tarjetas-historial">
+                <!-- Tarjetas se cargarán aquí -->
+            </div>
         </div>
     </div>
     <script src="assets/js/historial.js"></script>

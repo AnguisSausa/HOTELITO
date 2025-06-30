@@ -14,5 +14,12 @@ if ($action === 'listar') {
     exit;
 }
 
+if ($action === 'count') {
+    $result = $conexion->query("SELECT COUNT(*) as count FROM historial");
+    $row = $result->fetch_assoc();
+    echo json_encode(['success' => true, 'count' => intval($row['count'])]);
+    exit;
+}
+
 echo json_encode(['success' => false, 'error' => 'Acción no válida']);
 $conexion->close(); 

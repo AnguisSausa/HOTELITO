@@ -22,6 +22,8 @@ try {
         case 'GET':
             if ($action === 'obtener_una') {
                 obtenerHabitacion();
+            } else if ($action === 'count') {
+                contarHabitaciones();
             } else {
                 obtenerHabitaciones();
             }
@@ -246,5 +248,12 @@ function eliminarHabitacion() {
     } else {
         throw new Exception('Error al eliminar la habitación: ' . $stmt->error);
     }
+}
+
+function contarHabitaciones() {
+    global $conn;
+    $result = $conn->query("SELECT COUNT(*) as count FROM habitaciones");
+    $row = $result->fetch_assoc();
+    echo json_encode(['success' => true, 'count' => intval($row['count'])]);
 }
 ?> 
