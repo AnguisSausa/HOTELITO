@@ -5,475 +5,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Principal - Hotel</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7f8fc;
+            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
         }
-        
-        .header-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 30px 40px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            background: #667eea;
+            color: #fff;
+            z-index: 100;
+            box-shadow: 0 4px 24px rgba(102,126,234,0.08);
         }
-        
-        .principal-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .principal-header h1 {
-            color: #333;
-            font-size: 3rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-        }
-        
-        .principal-header p {
-            color: #666;
-            font-size: 1.2rem;
-            margin: 0;
-        }
-        
-        .user-welcome {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .user-welcome h3 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 1.5rem;
-        }
-        
-        .welcome-message {
-            font-size: 1.3rem;
-            color: #666;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-        
-        .client-badge, .admin-badge {
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-top: 10px;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .client-badge {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        .admin-badge {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-        
-        .principal-actions {
+        .header-content {
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2em 2.5em;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        
-        .btn-principal {
-            padding: 15px 30px;
+        .hotel-title {
+            font-size: 2em;
+            font-weight: 900;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+        }
+        .hotel-title i {
+            font-size: 1.3em;
+        }
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 1.5em;
+        }
+        #nombre-cliente {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(102,126,234,0.13);
+        }
+        #btn-logout {
+            font-size: 1em;
+            padding: 0.7em 2em;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            gap: 8px;
+            transition: background 0.2s, box-shadow 0.2s;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        #btn-logout:hover {
+            background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+            box-shadow: 0 8px 24px rgba(220, 53, 69, 0.18);
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        .main-content {
+            max-width: 1400px;
+            margin: 120px auto 0 auto;
+            padding: 0 2vw 40px 2vw;
         }
-        
-        .btn-logout {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-        }
-        
-        .btn-logout:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(220, 53, 69, 0.4);
-        }
-        
-        /* Estilos para las habitaciones */
-        .habitaciones-section {
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            min-height: calc(100vh - 300px);
-        }
-        
         .habitaciones-header {
             text-align: center;
             margin-bottom: 40px;
-            color: white;
         }
-        
         .habitaciones-header h2 {
-            color: white;
+            color: #667eea;
             font-size: 2.5rem;
             margin-bottom: 15px;
-            font-weight: 700;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            font-weight: 900;
+            letter-spacing: 1px;
         }
-        
         .habitaciones-header p {
-            color: rgba(255, 255, 255, 0.9);
+            color: #6b7280;
             font-size: 1.2rem;
             margin: 0;
         }
-        
         .habitaciones-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-            max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
         }
-        
         .habitacion-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-            transition: all 0.4s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #fff;
+            border-radius: 1.5em;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.10);
+            padding: 2.2em 1.5em 1.5em 1.5em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.2s, transform 0.2s;
         }
-        
         .habitacion-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 16px 48px rgba(102,126,234,0.18);
+            transform: translateY(-4px) scale(1.03);
         }
-        
         .habitacion-imagen {
-            position: relative;
-            height: 250px;
+            width: 100%;
+            height: 160px;
+            border-radius: 1em;
             overflow: hidden;
+            margin-bottom: 1.2em;
+            background: #e0e7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
         .habitacion-imagen img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.4s ease;
+            border-radius: 1em;
         }
-        
-        .habitacion-card:hover .habitacion-imagen img {
-            transform: scale(1.08);
-        }
-        
-        .imagen-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-        }
-        
-        .imagen-placeholder i {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            opacity: 0.6;
-        }
-        
-        .habitacion-status {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 8px 15px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .habitacion-status.disponible {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        .habitacion-info {
-            padding: 25px;
-        }
-        
         .habitacion-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            gap: 0.7em;
+            margin-bottom: 0.7em;
         }
-        
-        .habitacion-header h3 {
-            color: #333;
-            font-size: 1.5rem;
-            margin: 0;
-            font-weight: 700;
-        }
-        
         .habitacion-tipo {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            background: #667eea;
+            color: #fff;
+            font-size: 0.9em;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            border-radius: 0.7em;
+            padding: 0.2em 1em;
+            display: inline-block;
         }
-        
+        .habitacion-estado {
+            display: inline-block;
+            margin-left: 0.7em;
+            padding: 0.2em 1em;
+            border-radius: 0.7em;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: capitalize;
+            vertical-align: middle;
+        }
+        .status-disponible {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-ocupada {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-mantenimiento {
+            background: #fff3cd;
+            color: #856404;
+        }
         .habitacion-descripcion {
-            color: #666;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            color: #6b7280;
+            font-size: 1em;
+            margin-bottom: 0.7em;
+            text-align: center;
+            min-height: 2.2em;
         }
-        
         .habitacion-detalles {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 12px;
-        }
-        
-        .detalle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 1rem;
-        }
-        
-        .detalle.precio {
-            color: #28a745;
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-        
-        .btn-reservar {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
+            margin-bottom: 1em;
+            color: #374151;
+            font-size: 1em;
+        }
+        .btn-reservar {
+            background: linear-gradient(90deg, #10b981 0%, #667eea 100%);
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: 700;
+            padding: 0.8em 2.5em;
+            border-radius: 0.8em;
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            box-shadow: 0 4px 18px rgba(16,185,129,0.13);
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        
         .btn-reservar:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(90deg, #667eea 0%, #10b981 100%);
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 8px 32px rgba(102,126,234,0.18);
+            color: #fff;
         }
-        
-        .loading-habitaciones {
-            text-align: center;
-            padding: 60px;
-            color: white;
-        }
-        
-        .loading-habitaciones i {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: white;
-        }
-        
-        .loading-habitaciones p {
-            font-size: 1.2rem;
-            margin: 0;
-        }
-        
-        .no-habitaciones, .error-habitaciones {
-            text-align: center;
-            padding: 60px;
-            color: white;
-        }
-        
-        .no-habitaciones i, .error-habitaciones i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .no-habitaciones p, .error-habitaciones p {
-            font-size: 1.2rem;
-            margin: 0;
-        }
-        
-        .btn-reintentar {
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        
-        .btn-reintentar:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        @media (max-width: 768px) {
-            .header-section {
-                padding: 20px;
+        @media (max-width: 900px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1em;
             }
-            
-            .principal-header h1 {
-                font-size: 2rem;
+            .main-content {
+                margin-top: 140px;
             }
-            
-            .habitaciones-section {
-                padding: 20px;
-            }
-            
             .habitaciones-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
-            }
-            
-            .habitaciones-header h2 {
-                font-size: 2rem;
-            }
-            
-            .principal-actions {
-                gap: 15px;
-            }
-            
-            .btn-principal {
-                padding: 12px 20px;
-                font-size: 1rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .habitacion-card {
-                margin: 0 10px 20px 10px;
-            }
-            
-            .habitacion-info {
-                padding: 20px;
-            }
-            
-            .habitacion-detalles {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header-section" style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="flex:1;">
-            <div class="principal-header">
-                <h1>Página Principal - Hotel</h1>
-                <p>Bienvenido a la plataforma de gestión de tu estancia</p>
+    <header class="main-header">
+        <div class="header-content">
+            <div class="hotel-title">
+                <i class="fas fa-hotel"></i> Paraiso Perdido
             </div>
-            
-            <div class="user-welcome">
-                <div class="welcome-message" id="welcome-message">¡Hola!</div>
-                <h3>¡Hola <span id="user-name">Usuario</span>!</h3>
-                <p>Has iniciado sesión como <span id="user-type" class="client-badge">Cliente</span></p>
-            </div>
-            
-            <div class="principal-actions">
-                <a href="habitaciones.html" class="btn-principal btn-primary">
-                    <i class="fas fa-bed"></i> Ver Habitaciones
-                </a>
-                <a href="reservas.html" class="btn-principal btn-primary">
-                    <i class="fas fa-calendar-check"></i> Hacer Reserva
-                </a>
+            <div class="header-user">
+                <span id="nombre-cliente"></span>
+                <button id="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
             </div>
         </div>
-        <button class="btn-principal btn-logout" id="btn-logout" style="margin-left:auto;">
-            <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-        </button>
-    </div>
-    
-    <!-- Sección de habitaciones disponibles -->
-    <div class="habitaciones-section">
-        <div class="habitaciones-header">
-            <h2>Habitaciones Disponibles</h2>
-            <p>Explora nuestras habitaciones y encuentra la perfecta para tu estadía</p>
-        </div>
-        
-        <!-- Loading -->
-        <div id="loading-habitaciones" class="loading-habitaciones">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Cargando habitaciones disponibles...</p>
-        </div>
-        
-        <!-- Contenedor de habitaciones -->
-        <div id="habitaciones-container" class="habitaciones-grid">
-            <!-- Las habitaciones se cargarán dinámicamente aquí -->
-        </div>
-    </div>
-
+    </header>
+    <main class="main-content">
+        <section>
+            <div class="habitaciones-header">
+                <h2><i class="fas fa-bed"></i> Habitaciones Disponibles</h2>
+                <p>Explora nuestras habitaciones y encuentra la perfecta para tu estadía</p>
+            </div>
+            <div id="loading-habitaciones" style="text-align:center; margin:2em 0;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Cargando habitaciones disponibles...</p>
+            </div>
+            <div class="habitaciones-grid" id="habitaciones-container">
+                <!-- Las habitaciones se cargarán dinámicamente aquí -->
+            </div>
+        </section>
+    </main>
     <script src="assets/js/paginaprincipal.js"></script>
     <script>
-    document.getElementById('btn-logout').onclick = function() {
-        localStorage.clear();
-        window.location.href = 'index.html';
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mostrar nombre del cliente
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        if(usuario && (usuario.nombre_usuario || usuario.nombre)) {
+            document.getElementById('nombre-cliente').textContent = usuario.nombre_usuario || usuario.nombre;
+        } else {
+            document.getElementById('nombre-cliente').textContent = '';
+        }
+        // Botón cerrar sesión
+        document.getElementById('btn-logout').onclick = function() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        };
+    });
     </script>
 </body>
 </html>

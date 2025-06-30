@@ -88,8 +88,14 @@ const crearCuenta = async () => {
         const data = await response.json();
 
         if (data.success) {
-            // Guardar usuario en localStorage
+            // Refuerzo: tomar id de usuario_id o id
+            const id = data.usuario_id || data.id;
+            if (!id) {
+                Swal.fire({ title: "Error!", text: "No se pudo obtener el ID del usuario. Contacta al administrador.", icon: "error" });
+                return;
+            }
             localStorage.setItem('usuario', JSON.stringify({
+                id: id,
                 nombre: nombre,
                 email: email,
                 fotoPerfil: imagenBase64

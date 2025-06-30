@@ -82,23 +82,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     total += minibarTotal;
     document.getElementById('monto-total').textContent = `$${parseFloat(total).toFixed(2)}`;
 
-    // Mostrar datos de la reservación
+    // Mostrar datos de la reservación desde localStorage si existen
+    let reservacionLS = localStorage.getItem('reservacion_actual');
+    if (reservacionLS) {
+        try {
+            reservacion = JSON.parse(reservacionLS);
+        } catch (e) { reservacion = null; }
+    }
+
+    // Mostrar solo los campos de la tabla reservations
     if (reservacion) {
-        document.getElementById('habitacion-numero').textContent = reservacion.room_number || reservacion.habitacion || '';
-        document.getElementById('habitacion-tipo').textContent = reservacion.room_type || reservacion.tipo || '';
-        document.getElementById('fecha-entrada').textContent = reservacion.fecha_entrada || '';
-        document.getElementById('num-noches').textContent = reservacion.num_noches || '';
-        document.getElementById('precio-noche').textContent = reservacion.precio_noche ? `$${parseFloat(reservacion.precio_noche).toFixed(2)}` : '';
+        // Mostrar datos principales en la tarjeta de datos de reservación
+        const datosReserva = `
+            <div class="reserva-dato"><b>Habitación:</b> ${reservacion.rooms_id || ''}</div>
+            <div class="reserva-dato"><b>Días:</b> ${reservacion.num_noches || ''}</div>
+            <div class="reserva-dato"><b>Fecha de entrada:</b> ${reservacion.entrada || ''}</div>
+            <div class="reserva-dato"><b>Precio por noche:</b> $${reservacion.total_precio && reservacion.num_noches ? (parseFloat(reservacion.total_precio) / parseInt(reservacion.num_noches)).toFixed(2) : ''}</div>
+        `;
+        const datosReservaContainer = document.getElementById('datos-reservacion');
+        if (datosReservaContainer) {
+            datosReservaContainer.innerHTML = `<h2>Datos de tu reservación</h2>${datosReserva}`;
+        }
+        // Mostrar el total grande
+        const totalContainer = document.getElementById('monto-total');
+        if (totalContainer) {
+            totalContainer.textContent = `$${parseFloat(reservacion.total_precio).toFixed(2)}`;
+            totalContainer.style.fontSize = '2.5em';
+            totalContainer.style.color = '#10b981';
+            totalContainer.style.fontWeight = 'bold';
+        }
     }
 
     // Mostrar detalles en reservation-info si existe
     const detallesContainer = document.getElementById('reservation-details');
     if (detallesContainer && reservacion) {
         detallesContainer.innerHTML = `
-            <div class="detail-item"><span style='font-size:1.2em;'>&#128719;</span> <span>Habitación: ${reservacion.room_number || ''}</span></div>
-            <div class="detail-item"><span style='font-size:1.2em;'>&#128197;</span> <span>Fecha de entrada: ${reservacion.fecha_entrada || ''}</span></div>
-            <div class="detail-item"><span style='font-size:1.2em;'>&#127769;</span> <span>Noches: ${reservacion.num_noches || ''}</span></div>
-            <div class="detail-item"><span style='font-size:1.2em;'>&#128181;</span> <span>Total habitación: $${reservacion.total_precio ? parseFloat(reservacion.total_precio).toFixed(2) : '0.00'}</span></div>
+            <div class="detail-item"><b>ID Reservación:</b> ${reservacion.reservation_id || ''}</div>
+            <div class="detail-item"><b>ID Usuario:</b> ${reservacion.user_id || ''}</div>
+            <div class="detail-item"><b>ID Habitación:</b> ${reservacion.rooms_id || ''}</div>
+            <div class="detail-item"><b>Fecha de entrada:</b> ${reservacion.entrada || ''}</div>
+            <div class="detail-item"><b>Noches:</b> ${reservacion.num_noches || ''}</div>
+            <div class="detail-item"><b>Total habitación:</b> $${reservacion.total_precio ? parseFloat(reservacion.total_precio).toFixed(2) : '0.00'}</div>
         `;
     }
 }); 

@@ -200,6 +200,10 @@ async function enviarReservacion(formData) {
     btnReservar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
     
     try {
+        // Imprimir usuario de localStorage antes de enviar
+        const usuarioDebug = JSON.parse(localStorage.getItem('usuario'));
+        console.log('Usuario en localStorage antes de enviar reservación:', usuarioDebug);
+        console.log('ID del usuario (localStorage):', usuarioDebug ? usuarioDebug.id : 'No hay usuario');
         // Preparar datos para enviar
         const datosReservacion = {
             user_id: formData.get('user_id'),
@@ -232,13 +236,23 @@ async function enviarReservacion(formData) {
         const data = await response.json();
         
         if (data.success) {
+            // Guardar solo los campos que existen en la tabla reservations
+            const reservacionGuardada = {
+                reservation_id: data.reservation_id,
+                user_id: usuarioActual.id,
+                rooms_id: habitacionSeleccionada.room_id,
+                entrada: data.datos_reservacion?.fecha_entrada || formData.get('fecha_entrada'),
+                num_noches: data.datos_reservacion?.num_noches || formData.get('num_noches'),
+                total_precio: data.datos_reservacion?.total_precio || (parseFloat(habitacionSeleccionada.precio_noche) * parseInt(formData.get('num_noches')))
+            };
+            localStorage.setItem('reservacion_actual', JSON.stringify(reservacionGuardada));
             Swal.fire({
-                title: '¡Reservación Exitosa!',
-                text: 'Tu reservación ha sido confirmada',
+                title: '¡Reservación exitosa!',
+                text: 'Tu reservación ha sido creada correctamente.',
                 icon: 'success',
                 confirmButtonColor: '#28a745'
             }).then(() => {
-                window.location.href = 'paginaprincipal.html';
+                window.location.href = 'miestancia.html';
             });
         } else if (data.error) {
             // Si el backend manda un array de errores, únelos en un solo string

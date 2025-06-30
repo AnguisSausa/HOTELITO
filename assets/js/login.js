@@ -47,17 +47,26 @@ const loginUsuario = async () => {
         const data = await response.json();
 
         if (data.success) {
+            // Refuerzo: tomar id de usuario_id o id
+            const id = data.usuario?.id || data.usuario_id || data.id;
+            if (!id) {
+                Swal.fire({ title: "Error!", text: "El usuario no tiene ID. Contacta al administrador.", icon: "error" });
+                return;
+            }
             // Guardar usuario en localStorage
-            localStorage.setItem('usuario', JSON.stringify(data.usuario));
-            
+            localStorage.setItem('usuario', JSON.stringify({
+                id: id,
+                nombre: data.usuario?.nombre || '',
+                email: data.usuario?.email || '',
+                fotoPerfil: data.usuario?.fotoPerfil || ''
+            }));
             // Redirigir según el tipo de usuario
-            const tipoUsuario = data.usuario.tipo?.toLowerCase();
+            const tipoUsuario = data.usuario?.tipo?.toLowerCase();
             if (tipoUsuario === 'admin') {
                 window.location.href = 'home.html';
             } else {
                 window.location.href = 'paginaprincipal.html';
             }
-            
         } else {
             Swal.fire({ title: "Error!", text: data.message, icon: "error" });
         }

@@ -28,10 +28,10 @@ function cargarInformacionUsuario() {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     
     if (usuario) {
-        // Mostrar nombre del usuario
-        const userNameElement = document.getElementById('user-name');
-        if (userNameElement) {
-            userNameElement.textContent = usuario.nombre || 'Usuario';
+        // Mostrar nombre del usuario en el header
+        const nombreCliente = document.getElementById('nombre-cliente');
+        if (nombreCliente) {
+            nombreCliente.textContent = usuario.nombre_usuario || usuario.nombre || 'Usuario';
         }
         
         // Mostrar tipo de usuario (cliente o admin)
@@ -97,7 +97,23 @@ function mostrarHabitaciones(habitaciones) {
         return;
     }
     
-    const habitacionesHTML = habitaciones.map(habitacion => `
+    const habitacionesHTML = habitaciones.map(habitacion => {
+        // Determinar clase de estado
+        let statusClass = '';
+        switch(habitacion.status.toLowerCase()) {
+            case 'disponible':
+                statusClass = 'status-disponible';
+                break;
+            case 'ocupada':
+                statusClass = 'status-ocupada';
+                break;
+            case 'mantenimiento':
+                statusClass = 'status-mantenimiento';
+                break;
+            default:
+                statusClass = '';
+        }
+        return `
         <div class="habitacion-card">
             <div class="habitacion-imagen">
                 ${habitacion.imagen ? 
@@ -107,14 +123,12 @@ function mostrarHabitaciones(habitaciones) {
                         <span>Sin imagen</span>
                     </div>`
                 }
-                <div class="habitacion-status disponible">
-                    <i class="fas fa-check-circle"></i> Disponible
-                </div>
             </div>
             <div class="habitacion-info">
                 <div class="habitacion-header">
                     <h3>Habitación ${habitacion.room_number}</h3>
                     <span class="habitacion-tipo">${habitacion.room_type}</span>
+                    <span class="habitacion-estado ${statusClass}">${habitacion.status}</span>
                 </div>
                 <p class="habitacion-descripcion">${habitacion.description || 'Sin descripción disponible'}</p>
                 <div class="habitacion-detalles">
@@ -132,7 +146,8 @@ function mostrarHabitaciones(habitaciones) {
                 </button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
     
     contenedor.innerHTML = habitacionesHTML;
 }
@@ -367,4 +382,9 @@ window.paginaprincipal = {
     mostrarBienvenida,
     manejarErrorSesion,
     reservarHabitacion
+};
+
+document.getElementById('btn-logout').onclick = function() {
+    localStorage.clear();
+    window.location.href = 'index.html';
 }; 
