@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Reservaciones</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .historial-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 2em;
+            box-shadow: 0 8px 40px rgba(102,126,234,0.13);
+            padding: 2.5em 2em;
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            font-size: 2.2em;
+            font-weight: 900;
+            margin-bottom: 1.5em;
+        }
+        .tarjetas-historial {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2em;
+            justify-content: center;
+        }
+        .tarjeta-historial {
+            background: #f8fafc;
+            border-radius: 1.2em;
+            box-shadow: 0 2px 12px rgba(102,126,234,0.10);
+            padding: 2em 1.5em;
+            min-width: 260px;
+            max-width: 350px;
+            flex: 1 1 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .tarjeta-historial .res-id {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.7em;
+        }
+        .tarjeta-historial .comentario {
+            color: #374151;
+            font-size: 1.05em;
+            margin-bottom: 0.2em;
+        }
+        @media (max-width: 700px) {
+            .historial-container {
+                padding: 1em 0.3em;
+            }
+            .tarjeta-historial {
+                min-width: unset;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="historial-container">
+        <h1>Historial de Reservaciones</h1>
+        <div class="tarjetas-historial" id="tarjetas-historial">
+            <!-- Tarjetas se cargarán aquí -->
+        </div>
+    </div>
+    <script src="assets/js/historial.js"></script>
+</body>
+</html> 
